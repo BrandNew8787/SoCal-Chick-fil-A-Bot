@@ -1,12 +1,16 @@
-import os
 import asyncio
-import aiohttp  # For asynchronous HTTP requests
-import webserver
+import os
 from typing import Final
-from dotenv import load_dotenv
+
 from discord import Intents, Client, Message
+from dotenv import load_dotenv
+
+import Anaheim_Ducks
+import LAFC
+import LA_Angels
+import LA_Clippers
+import webserver
 from responses import get_response
-import Anaheim_Ducks, LAFC, LA_Angels, LA_Clippers
 
 # STEP 0: LOAD OUR TOKEN FROM SOMEWHERE SAFE AND CREATE OUR GAME VARIABLES
 load_dotenv()
@@ -103,7 +107,7 @@ async def periodic_check():
                 clippers_4th_quarter = await LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
                 if clippers_4th_quarter:
                     await channel.send(
-                        "The opponents of the Los Angeles Clippers missed two free throws in a row at a home game! Free "
+                        "The opponents of the Los Angeles Clippers missed two free throws in a row at a home game! Free"
                         "Chick-fil-A sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to "
                         "claim your sandwich!"
                     )
@@ -141,7 +145,7 @@ async def send_message(message: Message, user_message: str) -> None:
         user_message = user_message[1:]
 
     try:
-        response: str = get_response(user_message)
+        response: str = await get_response(user_message)
         await message.author.send(response) if is_private else await message.channel.send(response)
     except Exception as e:
         print(e)
