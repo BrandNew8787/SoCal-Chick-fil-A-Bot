@@ -12,17 +12,17 @@ async def get_response(user_input: str) -> str:
 
     if lowered == '':
         return 'Well, you\'re awfully silent...'
-    elif 'hello @Chick-Fil-A-Bot' in lowered:
+    elif 'hello cfb' in lowered:
         return 'Hello there!'
-    elif 'how are you @Chick-Fil-A-Bot' in lowered:
+    elif 'how are you cfb' in lowered:
         return 'Good, thanks!'
     elif 'bye' in lowered:
-        return 'See you @Chick-Fil-A-Bot!'
-    elif 'roll dice @Chick-Fil-A-Bot' in lowered:
+        return 'See you cfb!'
+    elif 'roll dice cfb' in lowered:
         return f'You rolled: {randint(1, 6)}'
-    elif '@Chick-Fil-A-Bot' == lowered:
+    elif 'cfb' == lowered:
         return f'Click [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to open on ios'
-    elif '@Chick-Fil-A-Bot cng' == lowered:
+    elif '@chick-fil-a-bot cng' == lowered:
         next_game = await next_chance()
         return next_game
 
