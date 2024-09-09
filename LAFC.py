@@ -5,7 +5,8 @@ from datetime import datetime
 
 def get_next_lafc_home_game():
     # URL of the page
-    url = "https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major-League-Soccer"
+    url = ("https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
+           "-League-Soccer")
 
     # Send a GET request to the URL
     response = requests.get(url)
@@ -36,7 +37,7 @@ def get_next_lafc_home_game():
                 venue = row.find('td', {'data-stat': 'venue'}).text.strip()
                 if venue.lower() == "home":
                     opponent = row.find('td', {'data-stat': 'opponent'}).text.strip()
-                    return f"Next LAFC home game is on {match_date.strftime('%Y-%m-%d')} against {opponent}."
+                    return match_date.strftime('%Y-%m-%d'), opponent
 
         return "No upcoming LAFC home games found."
     else:
@@ -46,7 +47,8 @@ def get_next_lafc_home_game():
 # returns True or False if there is a home game today
 def game_today():
     # URL of the page
-    url = "https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major-League-Soccer"
+    url = ("https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
+           "-League-Soccer")
 
     # Send a GET request to the URL
     response = requests.get(url)
@@ -113,7 +115,6 @@ def upcoming_game(game):
         date = row.find('td', {'data-index': '0'}).get_text(strip=True)
         opponent_info = row.find('td', {'data-index': '1'})
         opponent = opponent_info.find('a', class_='table-entity-name').get_text(strip=True)
-        location = opponent_info.get_text(strip=True)[-2:]  # H or A
         time_info = row.find('td', {'data-index': '2'}).get_text(strip=True)
 
         venue_info = row.find('td', {'data-index': '3'})
@@ -127,17 +128,18 @@ def upcoming_game(game):
                     else:
                         opponent = opponent + " (A)"
             else:
-                venue = "N/A"
+                "N/A"
         else:
-            venue = "N/A"
-            city = "N/A"
+            "N/A"
+            "N/A"
         if '(H)' in opponent:
             return f"Next LAFC Home Game:\n\tDate: {date}\n\tOpponent: {opponent}\n\tTime: {time_info}"
 
 
 def get_match_results():
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/92.0.4515.107 Safari/537.36",
         "Referer": "https://www.espn.com/",
         "Accept-Language": "en-US,en;q=0.9",
     }
@@ -208,18 +210,12 @@ def get_match_results():
     else:
         return f"Failed to retrieve the page. Status code: {response.status_code}"
 
-
 # # URL of the ESPN page
 # url = "https://www.espn.com/soccer/team/results/_/id/18966/usa.lafc"
 #
 # # Get the match results
 # matches = get_match_results()
 #
-# # Check the type and structure of `matches`
-# if isinstance(matches, list):
-#     for match in matches:
-#         print(
-#             f"Date: {match['date']}, Match: {match['home_team']} vs {match['away_team']}, Result: {match['result']}, Outcome: {match['outcome']}")
-# else:
-#     # Print the error message if the function didn't return a list
-#     print(matches)
+# # Check the type and structure of `matches` if isinstance(matches, list): for match in matches: print( f"Date: {
+# match['date']}, Match: {match['home_team']} vs {match['away_team']}, Result: {match['result']}, Outcome: {match[
+# 'outcome']}") else: # Print the error message if the function didn't return a list print(matches)
