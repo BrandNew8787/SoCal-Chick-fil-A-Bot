@@ -1,8 +1,9 @@
-from nba_api.stats.endpoints import leaguegamefinder, playbyplayv2, scoreboard
+import json
 from datetime import datetime
+
 import requests
 from bs4 import BeautifulSoup
-import json
+from nba_api.stats.endpoints import leaguegamefinder, playbyplayv2
 
 
 def get_today_clippers_home_game_id():
@@ -33,6 +34,7 @@ def get_today_clippers_home_game_id():
         print("An error occurred:", e)
         return None
 
+
 # WL tells if the game is finished or not
 
 def get_next_clippers_home_game():
@@ -41,7 +43,8 @@ def get_next_clippers_home_game():
 
     # Set up headers to mimic a browser request
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/92.0.4515.107 Safari/537.36",
         "Referer": "https://www.cbssports.com/",
         "Accept-Language": "en-US,en;q=0.9",
     }
@@ -75,10 +78,14 @@ def get_next_clippers_home_game():
                         game_date_str = json_data.get('startDate').strip()
                         game_date = datetime.strptime(game_date_str, "%b %d, %Y")
 
+                        # Format the date as %Y-%m-%d
+                        formatted_game_date = game_date.strftime("%Y-%m-%d")
+
                         # Compare game date with today's date
                         if game_date >= datetime.now():
-                            game_info = f"Next Clippers Home Game:\n\t{game_date_str} \n\tOPP: {teams[0]['name'] if 'Clippers' not in teams[0]['name'] else teams[1]['name']} \n\tArena: {json_data.get('location', {}).get('name')}"
-                            return game_info
+                            return formatted_game_date, teams[0]['name'] if 'Clippers' not in teams[0]['name'] else \
+                                teams[1]['name']
+
                         break
         except json.JSONDecodeError:
             # Handle JSON parsing errors
@@ -111,8 +118,6 @@ def check_opponent_missed_two_ft_in_4th_quarter(game_id):
     # Get the play-by-play data for the game
     play_by_play = playbyplayv2.PlayByPlayV2(game_id=game_id).get_data_frames()[0]
 
-    missed_ft_count = 0
-
     for index, row in play_by_play.iterrows():
         event_msg_type = row['EVENTMSGTYPE']
         period = row['PERIOD']
@@ -132,7 +137,6 @@ def check_opponent_missed_two_ft_in_4th_quarter(game_id):
 def send_notification(message):
     print("Notification:", message)
     # Here you can implement the code to send notifications via email, SMS, etc.
-
 
 # # Main logic to check and notify
 # print(get_next_clippers_home_game())
