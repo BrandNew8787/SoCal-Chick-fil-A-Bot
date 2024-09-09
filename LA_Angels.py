@@ -1,7 +1,7 @@
-import asyncio
+from datetime import datetime
+
 import aiohttp  # For asynchronous HTTP requests
 import requests
-from datetime import datetime
 
 
 def get_next_angels_game():
@@ -26,8 +26,7 @@ def get_next_angels_game():
                     opponent_team = game['teams']['away']['team']['name'] if game['teams']['home']['team'][
                                                                                  'id'] == team_id else \
                         game['teams']['home']['team']['name']
-                    venue = game['venue']['name']
-                    return f"Next Angels Home game is on {game_date} against {opponent_team} at {venue}."
+                    return game_date, opponent_team
 
         return "No upcoming games found for the Angels."
     else:
@@ -78,11 +77,13 @@ async def check_angels_score():
                     return True
     return False
 
-# Run the asynchronous function using an event loop
-async def main():
-    result = await check_angels_score()
-    print(result)
 
-# Run the async function
-if __name__ == "__main__":
-    asyncio.run(main())
+# # Run the asynchronous function using an event loop
+# async def main():
+#     result = await check_angels_score()
+#     print(result)
+# 
+# 
+# # Run the async function
+# if __name__ == "__main__":
+#     asyncio.run(main())
