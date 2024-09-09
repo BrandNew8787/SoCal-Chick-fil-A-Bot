@@ -22,7 +22,7 @@ async def get_response(user_input: str) -> str:
         return f'You rolled: {randint(1, 6)}'
     elif 'cfb' == lowered:
         return f'Click [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to open on ios'
-    elif '@chick-fil-a-bot cng' == lowered:
+    elif 'cfb next game' == lowered:
         next_game = await next_chance()
         return next_game
 
