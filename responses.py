@@ -7,24 +7,41 @@ import LA_Angels
 import LA_Clippers
 
 
-async def get_response(user_input: str) -> str:
-    lowered: str = user_input.lower()
+async def get_response(user_input: str, bot_mention: str) -> str:
+    # Remove bot mention from the user_input to get the actual command
+    lowered = user_input.lower().replace(bot_mention, '').strip()
 
     if lowered == '':
         return 'Well, you\'re awfully silent...'
-    elif 'hello cfb' in lowered:
+    elif 'hello' in lowered:
         return 'Hello there!'
-    elif 'how are you cfb' in lowered:
+    elif 'how are you' in lowered:
         return 'Good, thanks!'
     elif 'bye' in lowered:
-        return 'See you cfb!'
-    elif 'roll dice cfb' in lowered:
+        return 'See you!'
+    elif 'roll dice' in lowered:
         return f'You rolled: {randint(1, 6)}'
-    elif 'cfb' == lowered:
-        return f'Click [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to open on ios'
-    elif 'cfb next game' == lowered:
+    elif 'next chance' in lowered:
         next_game = await next_chance()
         return next_game
+    elif 'next clippers game' in lowered:
+        clippers_date, clippers_opp = LA_Clippers.get_next_clippers_home_game()
+        clippers_date = datetime.strptime(clippers_date, '%b %d, %Y') if clippers_date else None
+        return f'The next Clippers Home Game:\n\tGAME: Clippers vs. {clippers_opp}\n\tDATE: {clippers_date}'
+    elif 'next ducks game' in lowered:
+        duck_date, duck_opp = await Anaheim_Ducks.get_ducks_next_home_game()  # Await here
+        duck_date = datetime.strptime(duck_date, "%b %d, %Y") if duck_date else None
+        return f'The next Ducks Home Game:\n\tGAME: Ducks vs. {duck_opp}\n\tDATE: {duck_date}'
+    elif 'next lafc game' in lowered:
+        lafc_date, lafc_opp = LAFC.get_next_lafc_home_game()
+        lafc_date = datetime.strptime(lafc_date, "%b %d, %Y") if lafc_date else None
+        return f'The next LAFC Home Game:\n\tGAME: LAFC vs. {lafc_opp}\n\tDATE: {lafc_date}'
+    elif 'next angels game' in lowered:
+        angels_date, angels_opp = LA_Angels.get_next_angels_game()
+        angels_date = datetime.strptime(angels_date, "%Y-%m-%d") if angels_date else None
+        return f'The next Angels Home Game:\n\tGAME: LAFC vs. {angels_opp}\n\tDATE: {angels_date}'
+    else:
+        return 'I don\'t understand that command.'
 
 
 async def next_chance():
