@@ -144,8 +144,11 @@ async def send_message(message: Message, user_message: str) -> None:
     if is_private := user_message[0] == '?':
         user_message = user_message[1:]
 
+    # Extract the bot's mention in the form <@bot_id>
+    bot_mention = f'<@{client.user.id}>'
+
     try:
-        response: str = await get_response(user_message)
+        response: str = await get_response(user_message, bot_mention)
         await message.author.send(response) if is_private else await message.channel.send(response)
     except Exception as e:
         print(e)
@@ -169,6 +172,15 @@ async def on_message(message: Message) -> None:
     channel: str = str(message.channel)
 
     print(f'[{channel}] {username}: "{message}"')
+
+    # Check if the bot is mentioned
+    if client.user in message.mentions:
+        bot_mention = f'<@{client.user.id}>'
+        response = await get_response(user_message, bot_mention)
+        await message.channel.send(response)
+        return
+
+    # Handle other messages
     await send_message(message, user_message)
 
 
