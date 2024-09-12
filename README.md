@@ -24,3 +24,21 @@ This bot is designed to notify users on a Discord server when certain game condi
   ```bash
   DISCORD_TOKEN=your_token_here
   DISCORD_CHANNEL_ID=your_channel_id_here
+
+### 2. Install Dependencies
+
+  ```bash
+ pip install discord.py python-dotenv asyncio
+
+### 3. Running the Bot
+
+- To start the bot, run:
+'''bash
+python bot.py
+
+### 4. Bot Commands
+- The bot can respond to the following commands when mentioned in a message:
+  - hello: The bot will greet you.
+  - how are you: The bot will respond with how it's doing.
+  - next chance: Displays the next chance for a free Chick-fil-A sandwich.
+  - next <team> game: Queries for the next home game for LAFC, Anaheim Ducks, LA Angels, or LA Clippers.
