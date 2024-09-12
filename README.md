@@ -29,12 +29,14 @@ This bot is designed to notify users on a Discord server when certain game condi
 
   ```bash
  pip install discord.py python-dotenv asyncio
+'''bash
 
 ### 3. Running the Bot
 
 - To start the bot, run:
 '''bash
 python bot.py
+'''bash
 
 ### 4. Bot Commands
 - The bot can respond to the following commands when mentioned in a message:
