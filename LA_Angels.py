@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import aiohttp  # For asynchronous HTTP requests
 import requests
@@ -7,8 +7,10 @@ import requests
 def get_next_angels_game():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID
-    today = datetime.today().strftime('%Y-%m-%d')
-    url = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId={team_id}&startDate={today}&endDate=2024-12-31"
+    today = datetime.today()
+    next_year = today + timedelta(days=365)
+    url = (f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId={team_id}"
+           f"&startDate={today.strftime('%Y-%m-%d')}&endDate={next_year.strftime('%Y-%m-%d')}")
 
     # Send a GET request to the API
     response = requests.get(url)
@@ -82,8 +84,10 @@ async def check_angels_score():
 # async def main():
 #     result = await check_angels_score()
 #     print(result)
-# 
-# 
+#
+#
 # # Run the async function
 # if __name__ == "__main__":
 #     asyncio.run(main())
+
+print(get_next_angels_game())
