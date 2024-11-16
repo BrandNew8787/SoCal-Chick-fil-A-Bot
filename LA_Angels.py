@@ -89,5 +89,5 @@ async def check_angels_score():
 # # Run the async function
 # if __name__ == "__main__":
 #     asyncio.run(main())
-
-print(get_next_angels_game())
+#
+# print(get_next_angels_game())
