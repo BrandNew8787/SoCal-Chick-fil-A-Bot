@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 def get_next_lafc_home_game():
-    # URL of the page
+    # URL of the page: eventually this website will need to be changed when the new schedule comes out
     url = ("https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
            "-League-Soccer")
 
@@ -29,15 +29,18 @@ def get_next_lafc_home_game():
         for row in rows:
             # Extract the date of the match
             date_str = row.find('th', {'data-stat': 'date'}).text.strip()
-            match_date = datetime.strptime(date_str, "%Y-%m-%d")
 
-            # Check if the match is in the future
-            if match_date >= today:
-                # Extract venue and check if it's a home game
-                venue = row.find('td', {'data-stat': 'venue'}).text.strip()
-                if venue.lower() == "home":
-                    opponent = row.find('td', {'data-stat': 'opponent'}).text.strip()
-                    return match_date.strftime('%Y-%m-%d'), opponent
+            # checks if there is a blank row indicating a separation for playoff games
+            if date_str != '':
+                match_date = datetime.strptime(date_str, "%Y-%m-%d")
+
+                # Check if the match is in the future
+                if match_date >= today:
+                    # Extract venue and check if it's a home game
+                    venue = row.find('td', {'data-stat': 'venue'}).text.strip()
+                    if venue.lower() == "home":
+                        opponent = row.find('td', {'data-stat': 'opponent'}).text.strip()
+                        return match_date.strftime('%Y-%m-%d'), opponent
 
         return "No upcoming LAFC home games found."
     else:
@@ -71,16 +74,18 @@ def game_today():
         for row in rows:
             # Extract the date of the match
             date_str = row.find('th', {'data-stat': 'date'}).text.strip()
-            match_date = datetime.strptime(date_str, "%Y-%m-%d")
+            # checks if there is a blank row indicating a separation for playoff games
+            if date_str != '':
+                match_date = datetime.strptime(date_str, "%Y-%m-%d")
 
-            # Check if the match is in the future
-            if match_date == today:
-                # Extract venue and check if it's a home game
-                venue = row.find('td', {'data-stat': 'venue'}).text.strip()
-                if venue.lower() == "home":
-                    return True
-            elif match_date > today:
-                return False
+                # Check if the match is in the future
+                if match_date == today:
+                    # Extract venue and check if it's a home game
+                    venue = row.find('td', {'data-stat': 'venue'}).text.strip()
+                    if venue.lower() == "home":
+                        return True
+                elif match_date > today:
+                    return False
         return False
     else:
         return f"Failed to retrieve the page. Status code: {response.status_code}"
@@ -210,6 +215,7 @@ def get_match_results():
     else:
         return f"Failed to retrieve the page. Status code: {response.status_code}"
 
+
 # # URL of the ESPN page
 # url = "https://www.espn.com/soccer/team/results/_/id/18966/usa.lafc"
 #
@@ -219,3 +225,5 @@ def get_match_results():
 # # Check the type and structure of `matches` if isinstance(matches, list): for match in matches: print( f"Date: {
 # match['date']}, Match: {match['home_team']} vs {match['away_team']}, Result: {match['result']}, Outcome: {match[
 # 'outcome']}") else: # Print the error message if the function didn't return a list print(matches)
+
+# print(get_next_lafc_home_game())
