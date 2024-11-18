@@ -45,13 +45,17 @@ async def get_today_angels_home_game():
         async with session.get(url) as response:
             data_mlb = await response.json()
 
-    games = data_mlb.get('dates', [])[0].get('games', [])
+    # checks if any games exists today
+    if len(data_mlb['dates']) != 0:
+        games = data_mlb.get('dates', [])[0].get('games', [])
 
-    for game in games:
-        # Check if the Angels are playing at home
-        if game['teams']['home']['team']['name'] == "Los Angeles Angels":
-            return True
-    return False
+        for game in games:
+            # Check if the Angels are playing at home
+            if game['teams']['home']['team']['name'] == "Los Angeles Angels":
+                return True
+        return False
+    else:
+        return False
 
 
 async def check_angels_score():

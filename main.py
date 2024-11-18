@@ -161,27 +161,56 @@ async def on_ready() -> None:
     await client.loop.create_task(periodic_check())  # Start the periodic check loop
 
 
+# # STEP 7: HANDLING INCOMING MESSAGES
+# @client.event
+# async def on_message(message: Message) -> None:
+#     autor = message.author
+#     user = client.user
+#     if message.author == client.user:
+#         return
+#
+#     username: str = str(message.author)
+#     user_message: str = message.content
+#     channel: str = str(message.channel)
+#
+#     print(f'[{channel}] {username}: "{message}"')
+#
+#     # Check if the bot is mentioned
+#     if client.user in message.content:
+#         bot_mention = f'<@{client.user.id}>'
+#         response = await get_response(user_message, bot_mention)
+#         await message.channel.send(response)
+#         return
+#
+#     # Handle other messages
+#     await send_message(message, user_message)
+
+
 # STEP 7: HANDLING INCOMING MESSAGES
 @client.event
 async def on_message(message: Message) -> None:
+    # Ignore messages from the bot itself
     if message.author == client.user:
         return
 
+    # Extract username, message content, and channel for logging
     username: str = str(message.author)
     user_message: str = message.content
     channel: str = str(message.channel)
 
-    print(f'[{channel}] {username}: "{message}"')
+    # Log the message
+    print(f'[{channel}] {username}: "{message.content}"')
 
     # Check if the bot is mentioned
-    if client.user in message.mentions:
-        bot_mention = f'<@{client.user.id}>'
-        response = await get_response(user_message, bot_mention)
+    bot_mention = f'<@{client.user.id}>'
+    if bot_mention in user_message:
+        # Remove the mention from the message to process only the actual text
+        cleaned_message = user_message.replace(bot_mention, "").strip()
+
+        # Generate a response and send it
+        response = await get_response(cleaned_message, bot_mention)
         await message.channel.send(response)
         return
-
-    # Handle other messages
-    await send_message(message, user_message)
 
 
 # STEP 8: MAIN ENTRY POINT
