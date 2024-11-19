@@ -9,13 +9,14 @@ from nba_api.stats.endpoints import leaguegamefinder, playbyplayv2
 def get_today_clippers_home_game_id():
     # Get today's date in the correct format
     today_date = datetime.today().strftime('%m/%d/%Y')
+    # other_date = "11/18/2024"
 
     try:
         # Simple test request to see if the API is reachable
         gamefinder = leaguegamefinder.LeagueGameFinder(
             team_id_nullable=1610612746,  # Clippers team ID
             date_from_nullable=today_date,
-            date_to_nullable='10/9/2024'
+            date_to_nullable=today_date
         )
         games = gamefinder.get_data_frames()[0]
 
@@ -141,7 +142,7 @@ def send_notification(message):
 # # Main logic to check and notify
 # print(get_next_clippers_home_game())
 # print(get_today_clippers_home_game_id())
-# check_opponent_missed_two_ft_in_4th_quarter(get_most_recent_clippers_home_game_vs_rockets())
+# # check_opponent_missed_two_ft_in_4th_quarter(get_most_recent_clippers_home_game_vs_rockets())
 # game_id = get_today_clippers_home_game_id()
 #
 # # Test the function
