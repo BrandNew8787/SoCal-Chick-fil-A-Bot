@@ -1,10 +1,11 @@
+import asyncio
 from datetime import datetime
 
 import aiohttp  # For asynchronous HTTP requests
 
 today = datetime.today().strftime('%Y-%m-%d')
-# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
-NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-04-18"
+NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
+# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-04-18"
 
 
 async def get_ducks_next_home_game():
@@ -38,6 +39,20 @@ async def ducks_home_game_today():
     return False
 
 
+# check if there is an away game today
+async def ducks_away_game_today():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(NHL_API_URL) as response:
+            data_nhl = await response.json()
+
+    # Check if it was a Ducks home game and they scored 5 points
+    daily_games = data_nhl['games']
+    for i in daily_games:
+        if i['awayTeam']['id'] == 24:
+            return True
+    return False
+
+
 async def check_ducks_score():
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
@@ -55,17 +70,35 @@ async def check_ducks_score():
     return "The game hasn't finished yet!"
 
 
-# async def main():
-#     result = await get_ducks_next_home_game()
-#     print(result)
-#     # Uncomment if you want to run the check_ducks_score function
-#     # score_result = await check_ducks_score()
-#     # if score_result:
-#     #     print("Ducks scored 5 points!")
-#     # else:
-#     #     print("The game hasn't finished, or they haven't scored 5 points yet.")
-#
-#
-# # Run the async function
-# if __name__ == "__main__":
-#     asyncio.run(main())
+# For testing the ducks games
+async def check_ducks_away_score():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(NHL_API_URL) as response:
+            data_nhl = await response.json()
+
+    # Check if it was a Ducks home game and they scored 5 points
+    daily_games = data_nhl['games']
+    for i in daily_games:
+        if i['awayTeam']['id'] == 24:
+            if 'scores' in i['awayTeam'] and 'gameOutcome' in i:
+                if i['awayTeam']['scores'] >= 1:
+                    return True
+                else:
+                    return False
+    return "The game hasn't finished yet!"
+
+
+async def main():
+    result = await get_ducks_next_home_game()
+    print(result)
+    # Uncomment if you want to run the check_ducks_score function
+    # score_result = await check_ducks_score()
+    # if score_result:
+    #     print("Ducks scored 5 points!")
+    # else:
+    #     print("The game hasn't finished, or they haven't scored 5 points yet.")
+
+
+# Run the async function
+if __name__ == "__main__":
+    asyncio.run(main())

@@ -44,7 +44,8 @@ async def check_for_games():
         LAFC_game = False
 
     try:
-        ANA_Ducks_game = await Anaheim_Ducks.ducks_home_game_today()  # Await the asynchronous function
+        # ANA_Ducks_game = await Anaheim_Ducks.ducks_home_game_today()  # Await the asynchronous function
+        ANA_Ducks_game = await Anaheim_Ducks.ducks_away_game_today()
     except Exception as e:
         print(f"Error checking Ducks game: {e}")
         ANA_Ducks_game = False
@@ -88,18 +89,24 @@ async def periodic_check():
                     )
                 LAFC_game = False  # Game is over, reset the state
             else:
+                print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         if ANA_Ducks_game:
-            ducks_results = await Anaheim_Ducks.check_ducks_score()
+            print("There's a game today!")
+            # ducks_results = await Anaheim_Ducks.check_ducks_score()
+
+            # added a function to check the away score to make sure this is working
+            ducks_results = await Anaheim_Ducks.check_ducks_away_score()
             if ducks_results != "The game hasn't finished yet!":
                 if ducks_results:
                     await channel.send(
-                        "The Anaheim Ducks have scored 5 or more goals at a home game! Free Chick-fil-A sandwich! Open "
+                        "The Anaheim Ducks have scored 1 or more goals at a home game! Free Chick-fil-A sandwich! Open "
                         "[here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!"
                     )
                 ANA_Ducks_game = False  # Game is over, reset the state
             else:
+                print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         if LA_Clippers_game:
@@ -113,6 +120,7 @@ async def periodic_check():
                     )
                 LA_Clippers_game = False  # Game is over, reset the state
             else:
+                print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         if LA_Angels_game:
@@ -125,14 +133,15 @@ async def periodic_check():
                     )
                 LA_Angels_game = False  # Game is over, reset the state
             else:
+                print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         # If there are still ongoing games, wait for 10 minutes before checking again
         if ongoing_games:
             await asyncio.sleep(600)  # Wait for 10 minutes before checking again
         else:
-            # No ongoing games, check for the next day's games immediately
-            await asyncio.sleep(43200)  # Wait for 12 hours before checking for new games
+            print("There are no home games today!")
+            await asyncio.sleep(21600)  # Wait for 12 hours before checking for new games
 
 
 # STEP 5: MESSAGE FUNCTIONALITY
@@ -159,31 +168,6 @@ async def send_message(message: Message, user_message: str) -> None:
 async def on_ready() -> None:
     print(f'{client.user} is now running!')
     await client.loop.create_task(periodic_check())  # Start the periodic check loop
-
-
-# # STEP 7: HANDLING INCOMING MESSAGES
-# @client.event
-# async def on_message(message: Message) -> None:
-#     autor = message.author
-#     user = client.user
-#     if message.author == client.user:
-#         return
-#
-#     username: str = str(message.author)
-#     user_message: str = message.content
-#     channel: str = str(message.channel)
-#
-#     print(f'[{channel}] {username}: "{message}"')
-#
-#     # Check if the bot is mentioned
-#     if client.user in message.content:
-#         bot_mention = f'<@{client.user.id}>'
-#         response = await get_response(user_message, bot_mention)
-#         await message.channel.send(response)
-#         return
-#
-#     # Handle other messages
-#     await send_message(message, user_message)
 
 
 # STEP 7: HANDLING INCOMING MESSAGES
