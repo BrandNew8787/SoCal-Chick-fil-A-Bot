@@ -81,24 +81,24 @@ async def check_ducks_away_score():
     for i in daily_games:
         if i['awayTeam']['id'] == 24:
             if 'scores' in i['awayTeam'] and 'gameOutcome' in i:
-                if i['awayTeam']['scores'] >= 1:
+                if i['awayTeam']['scores'] >= 2:
                     return True
                 else:
                     return False
     return "The game hasn't finished yet!"
 
 
-async def main():
-    result = await get_ducks_next_home_game()
-    print(result)
-    # Uncomment if you want to run the check_ducks_score function
-    # score_result = await check_ducks_score()
-    # if score_result:
-    #     print("Ducks scored 5 points!")
-    # else:
-    #     print("The game hasn't finished, or they haven't scored 5 points yet.")
-
-
-# Run the async function
-if __name__ == "__main__":
-    asyncio.run(main())
+# async def main():
+#     result = await get_ducks_next_home_game()
+#     print(result)
+#     # Uncomment if you want to run the check_ducks_score function
+#     # score_result = await check_ducks_score()
+#     # if score_result:
+#     #     print("Ducks scored 5 points!")
+#     # else:
+#     #     print("The game hasn't finished, or they haven't scored 5 points yet.")
+#
+#
+# # Run the async function
+# if __name__ == "__main__":
+#     asyncio.run(main())

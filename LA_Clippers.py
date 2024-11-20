@@ -139,8 +139,8 @@ def send_notification(message):
     print("Notification:", message)
     # Here you can implement the code to send notifications via email, SMS, etc.
 
-# # Main logic to check and notify
-# print(get_next_clippers_home_game())
+# Main logic to check and notify
+print(get_next_clippers_home_game())
 # print(get_today_clippers_home_game_id())
 # # check_opponent_missed_two_ft_in_4th_quarter(get_most_recent_clippers_home_game_vs_rockets())
 # game_id = get_today_clippers_home_game_id()

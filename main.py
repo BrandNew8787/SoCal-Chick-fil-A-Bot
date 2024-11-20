@@ -45,6 +45,8 @@ async def check_for_games():
 
     try:
         # ANA_Ducks_game = await Anaheim_Ducks.ducks_home_game_today()  # Await the asynchronous function
+
+        # using a away game function instead of a home
         ANA_Ducks_game = await Anaheim_Ducks.ducks_away_game_today()
     except Exception as e:
         print(f"Error checking Ducks game: {e}")
@@ -94,14 +96,17 @@ async def periodic_check():
 
         if ANA_Ducks_game:
             print("There's a game today!")
+            # FOR MAIN FUNCTION
             # ducks_results = await Anaheim_Ducks.check_ducks_score()
 
             # added a function to check the away score to make sure this is working
             ducks_results = await Anaheim_Ducks.check_ducks_away_score()
             if ducks_results != "The game hasn't finished yet!":
                 if ducks_results:
+
+                    # changed the message to state and away game had happened
                     await channel.send(
-                        "The Anaheim Ducks have scored 1 or more goals at a home game! Free Chick-fil-A sandwich! Open "
+                        "The Anaheim Ducks have scored 2 or more goals at an away game! Free Chick-fil-A sandwich! Open"
                         "[here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!"
                     )
                 ANA_Ducks_game = False  # Game is over, reset the state
@@ -141,7 +146,7 @@ async def periodic_check():
             await asyncio.sleep(600)  # Wait for 10 minutes before checking again
         else:
             print("There are no home games today!")
-            await asyncio.sleep(21600)  # Wait for 12 hours before checking for new games
+            await asyncio.sleep(21600)  # Wait for 6 hours before checking for new games
 
 
 # STEP 5: MESSAGE FUNCTIONALITY
