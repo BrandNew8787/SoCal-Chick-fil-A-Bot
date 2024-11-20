@@ -127,10 +127,13 @@ async def periodic_check():
             print("There's a Clipper's game today!")
             clippers_result = LA_Clippers.check_game_finish()
             if clippers_result == "W" or clippers_result == "L":
-                clippers_4th_quarter = await LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
+                # clippers_4th_quarter = await LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
+                clippers_4th_quarter = await LA_Clippers.check_opponent_made_one_ft_in_4th_quarter(clippers_game_id)
                 if clippers_4th_quarter:
+
+                    # changed this so that it checks if the opponent made one basket or not
                     await channel.send(
-                        "The opponents of the Los Angeles Clippers missed two free throws in a row at a home game! Free"
+                        "The opponents of the Los Angeles Clippers made 1 free throw at a home game! Free"
                         "Chick-fil-A sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to "
                         "claim your sandwich!"
                     )

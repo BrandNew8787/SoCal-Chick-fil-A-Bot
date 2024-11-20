@@ -193,6 +193,43 @@ def check_opponent_missed_two_ft_in_4th_quarter(game_id):
     return False
 
 
+def check_opponent_made_one_ft_in_4th_quarter(game_id):
+    # Get the play-by-play data for the game
+    play_by_play = playbyplayv2.PlayByPlayV2(game_id=game_id).get_data_frames()[0]
+
+    for index, row in play_by_play.iterrows():
+        event_msg_type = row['EVENTMSGTYPE']
+        period = row['PERIOD']
+        description = row['HOMEDESCRIPTION'] or row['VISITORDESCRIPTION'] or ''
+        team_name = 'Clippers' if row['PLAYER1_TEAM_ID'] == 1610612746 else 'Opponent'
+
+        # We are only interested in the 4th quarter (period 4)
+        if period == 4:
+            # Check for missed free throw events by the opponent
+            if event_msg_type == 3 and ("1 of 2" in description or "1 of 3" in description):
+                if team_name == 'Opponent':
+                    return True
+
+    return False
+
+
+def get_most_recent_clippers_home_game_vs_rockets():
+    # Find the most recent game between the Clippers and the Rockets where the Clippers were the home team
+    gamefinder = leaguegamefinder.LeagueGameFinder(team_id_nullable=1610612746)  # Clippers team ID
+    games = gamefinder.get_data_frames()[0]
+
+    # Filter the games for home games against the Rockets (HOU)
+    clippers_home_games_vs_rockets = games[(games['MATCHUP'].str.contains('vs. HOU'))]
+
+    if not clippers_home_games_vs_rockets.empty:
+        # Get the most recent home game
+        most_recent_game = clippers_home_games_vs_rockets.iloc[0]  # First row is the most recent
+        game_id = most_recent_game['GAME_ID']
+        return game_id
+    else:
+        return None
+
+
 def send_notification(message):
     print("Notification:", message)
     # Here you can implement the code to send notifications via email, SMS, etc.
@@ -201,7 +238,8 @@ def send_notification(message):
 # # Main logic to check and notify
 # print(get_next_clippers_home_game())
 #
-# # check_opponent_missed_two_ft_in_4th_quarter(get_most_recent_clippers_home_game_vs_rockets())
+print(check_opponent_missed_two_ft_in_4th_quarter(get_most_recent_clippers_home_game_vs_rockets()))
+
 # game_id = get_games_schedule()
 #
 # next_clippers_game()
