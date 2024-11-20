@@ -46,7 +46,7 @@ async def check_for_games():
     try:
         # ANA_Ducks_game = await Anaheim_Ducks.ducks_home_game_today()  # Await the asynchronous function
 
-        # using a away game function instead of a home
+        # using an away game function instead of a home
         ANA_Ducks_game = await Anaheim_Ducks.ducks_away_game_today()
     except Exception as e:
         print(f"Error checking Ducks game: {e}")
@@ -59,9 +59,9 @@ async def check_for_games():
         LA_Angels_game = False
 
     try:
-        result = LA_Clippers.get_today_clippers_home_game_id()  # Await the asynchronous function
+        result = await LA_Clippers.get_games_schedule()  # Await the asynchronous function
         if result:
-            clippers_game_id, clippers_result = result
+            clippers_game_id = result
             LA_Clippers_game = clippers_game_id is not None
         else:
             LA_Clippers_game = False
@@ -82,6 +82,7 @@ async def periodic_check():
         ongoing_games = False
 
         if LAFC_game:
+            print("There's a LAFC game today!")
             lafc_results = await LAFC.get_match_results()
             if lafc_results != "The game has not finished yet!":
                 if lafc_results['outcome'] == "Win":
@@ -89,13 +90,17 @@ async def periodic_check():
                         "LAFC has won their home game! Free Chick-fil-A sandwich! Open "
                         "[here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!"
                     )
-                LAFC_game = False  # Game is over, reset the state
+
+                # Game is over, reset the state
+                LAFC_game = False
+                ongoing_games = False
+
             else:
                 print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         if ANA_Ducks_game:
-            print("There's a game today!")
+            print("There's a Duck's game today!")
             # FOR MAIN FUNCTION
             # ducks_results = await Anaheim_Ducks.check_ducks_score()
 
@@ -109,12 +114,18 @@ async def periodic_check():
                         "The Anaheim Ducks have scored 2 or more goals at an away game! Free Chick-fil-A sandwich! Open"
                         "[here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!"
                     )
-                ANA_Ducks_game = False  # Game is over, reset the state
+
+                # Game is over, reset the state
+                ANA_Ducks_game = False
+                ongoing_games = False
+
             else:
                 print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         if LA_Clippers_game:
+            print("There's a Clipper's game today!")
+            clippers_result = LA_Clippers.check_game_finish()
             if clippers_result == "W" or clippers_result == "L":
                 clippers_4th_quarter = await LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
                 if clippers_4th_quarter:
@@ -123,12 +134,17 @@ async def periodic_check():
                         "Chick-fil-A sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to "
                         "claim your sandwich!"
                     )
-                LA_Clippers_game = False  # Game is over, reset the state
+
+                # Game is over, reset the state
+                LA_Clippers_game = False
+                ongoing_games = False
+
             else:
                 print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         if LA_Angels_game:
+            print("There's an Angels Game today!")
             angels_result = await LA_Angels.check_angels_score()
             if angels_result != "The game has not finished yet!":
                 if angels_result:
@@ -136,7 +152,11 @@ async def periodic_check():
                         "The Los Angeles Angels have scored 7 points! Free Chick-fil-A sandwich!"
                         " Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!"
                     )
-                LA_Angels_game = False  # Game is over, reset the state
+
+                # Game is over, reset the state
+                LA_Angels_game = False
+                ongoing_games = False
+
             else:
                 print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
