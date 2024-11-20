@@ -193,6 +193,7 @@ def check_opponent_missed_two_ft_in_4th_quarter(game_id):
     return False
 
 
+# this function is made so that I can check whether the function handles arguments properly
 def check_opponent_made_one_ft_in_4th_quarter(game_id):
     # Get the play-by-play data for the game
     play_by_play = playbyplayv2.PlayByPlayV2(game_id=game_id).get_data_frames()[0]
