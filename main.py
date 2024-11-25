@@ -44,10 +44,10 @@ async def check_for_games():
         LAFC_game = False
 
     try:
-        # ANA_Ducks_game = await Anaheim_Ducks.ducks_home_game_today()  # Await the asynchronous function
+        ANA_Ducks_game = await Anaheim_Ducks.ducks_home_game_today()  # Await the asynchronous function
 
         # using an away game function instead of a home
-        ANA_Ducks_game = await Anaheim_Ducks.ducks_away_game_today()
+        # ANA_Ducks_game = await Anaheim_Ducks.ducks_away_game_today()
     except Exception as e:
         print(f"Error checking Ducks game: {e}")
         ANA_Ducks_game = False
@@ -59,9 +59,8 @@ async def check_for_games():
         LA_Angels_game = False
 
     try:
-        result = await LA_Clippers.get_games_schedule()  # Await the asynchronous function
-        if result:
-            clippers_game_id = result
+        clippers_game_id = await LA_Clippers.get_game_id_today()  # Await the asynchronous function
+        if clippers_game_id:
             LA_Clippers_game = clippers_game_id is not None
         else:
             LA_Clippers_game = False
@@ -102,16 +101,16 @@ async def periodic_check():
         if ANA_Ducks_game:
             print("There's a Duck's game today!")
             # FOR MAIN FUNCTION
-            # ducks_results = await Anaheim_Ducks.check_ducks_score()
+            ducks_results = await Anaheim_Ducks.check_ducks_score()
 
             # added a function to check the away score to make sure this is working
-            ducks_results = await Anaheim_Ducks.check_ducks_away_score()
+            # ducks_away_results = await Anaheim_Ducks.check_ducks_away_score()
             if ducks_results != "The game hasn't finished yet!":
                 if ducks_results:
 
                     # changed the message to state and away game had happened
                     await channel.send(
-                        "The Anaheim Ducks have scored 2 or more goals at an away game! Free Chick-fil-A sandwich! Open"
+                        "The Anaheim Ducks have scored 5 or more goals at a home game! Free Chick-fil-A sandwich! Open"
                         "[here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!"
                     )
 

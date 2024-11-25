@@ -42,7 +42,7 @@ def get_next_lafc_home_game():
                         opponent = row.find('td', {'data-stat': 'opponent'}).text.strip()
                         return match_date.strftime('%Y-%m-%d'), opponent
 
-        return "No upcoming LAFC home games found."
+        return "No upcoming LAFC home games found.", None
     else:
         return f"Failed to retrieve the page. Status code: {response.status_code}"
 

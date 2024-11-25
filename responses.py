@@ -36,8 +36,11 @@ async def get_response(user_input: str, bot_mention: str) -> str:
         return f"The next Ducks Home Game:\n\tGAME: Ducks vs. {duck_opp}\n\tDATE: {duck_date.strftime('%b %d, %Y')}"
     elif 'next lafc game' in lowered:
         lafc_date, lafc_opp = LAFC.get_next_lafc_home_game()
-        lafc_date = datetime.strptime(lafc_date, "%Y-%m-%d") if lafc_date else None
-        return f"The next LAFC Home Game:\n\tGAME: LAFC vs. {lafc_opp}\n\tDATE: {lafc_date.strftime('%b %d, %Y')}"
+        if lafc_date == "No upcoming LAFC home games found." :
+            return "There are no scheduled LAFC Home Games coming up. Try again in January for next years schedule."
+        else:
+            lafc_date = datetime.strptime(lafc_date, "%Y-%m-%d") if lafc_date else None
+            return f"The next LAFC Home Game:\n\tGAME: LAFC vs. {lafc_opp}\n\tDATE: {lafc_date.strftime('%b %d, %Y')}"
     elif 'next angels game' in lowered:
         angels_date, angels_opp = LA_Angels.get_next_angels_game()
         angels_date = datetime.strptime(angels_date, "%Y-%m-%d") if angels_date else None
@@ -56,7 +59,7 @@ async def next_chance():
     # Convert dates to datetime objects for comparison
     today = datetime.now()
 
-    lafc_date = datetime.strptime(lafc_date, "%Y-%m-%d") if lafc_date else None
+    lafc_date = datetime.strptime(lafc_date, "%Y-%m-%d") if lafc_date != "No upcoming LAFC home games found." else None
     duck_date = datetime.strptime(duck_date, "%Y-%m-%d") if duck_date else None
     angels_date = datetime.strptime(angels_date, "%Y-%m-%d") if angels_date else None
     clippers_date = datetime.strptime(clippers_date, "%Y-%m-%d") if clippers_date else None
@@ -81,7 +84,10 @@ async def next_chance():
             closest_team = team
             closest_opponent = data["opponent"]
 
-    if closest_team:
+    if closest_date.strftime("%Y-%m-%d") == today.strftime("%Y-%m-%d"):
+        return (f"There's a chance **TODAY** for a free Chick-Fil-A sandwich is for the following game: "
+                f"\n\tGAME: {closest_team} vs {closest_opponent} \n\tDATE: {closest_date.strftime('%b %d, %Y')}")
+    elif closest_team:
         return (f"The next chance for a free Chick-Fil-A sandwich is for the following game: "
                 f"\n\tGAME: {closest_team} vs {closest_opponent} \n\tDATE: {closest_date.strftime('%b %d, %Y')}")
     else:

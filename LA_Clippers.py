@@ -6,7 +6,6 @@ import requests
 from bs4 import BeautifulSoup
 from nba_api.stats.endpoints import leaguegamefinder, playbyplayv2
 from nba_api.live.nba.endpoints import playbyplay
-from nba_api.live.nba.endpoints import scoreboard
 
 
 # once the game is over, this function works!
@@ -47,7 +46,7 @@ def check_live_game():
 
     try:
         # Simple test request to see if the API is reachable
-        games = playbyplay.PlayByPlay(game_id=get_games_schedule()).get_dict()
+        games = playbyplay.PlayByPlay(game_id=get_game_id_today()).get_dict()
 
         # Filter the games to find a home game (indicated by 'vs.' in the MATCHUP field)
         clippers_home_game_today = games[games['MATCHUP'].str.contains('vs.')]
@@ -64,7 +63,7 @@ def check_live_game():
 
 
 # This is the new function that returns the id if there is a clippers home game today
-async def get_games_schedule():
+async def get_game_id_today():
     # Fetch the JSON data from the API
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -74,15 +73,20 @@ async def get_games_schedule():
     today = datetime.today().strftime("%m/%d/%Y")
     season = datetime.today().strftime("%Y")
 
+    # this is a date where the opponent of the clippers missed 2 free throws
+    # other_date = "11/18/2024"
+
     # URL to fetch the JSON data
     url = f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season}&RegionID=1&Date={today}&EST=Y"
 
     response = requests.get(url, headers=headers)
     data = response.json()
 
-    # Extract the games from the NextGameList
+    # Extract the upcoming games
     future_games = data["resultSets"][0]["NextGameList"]
-    ongoing_games = data["resultSets"][1]["CompleteGameList"]
+
+    # Extract either live or finished games
+    ongoing_finished_games = data["resultSets"][1]["CompleteGameList"]
 
     # Format and print the games
     print("NBA Games for 11/20/2024:")
@@ -101,9 +105,9 @@ async def get_games_schedule():
             )
             return game["gameID"]
 
-    # This is to check if there are any games today if they are currently playing live.
-    for game in ongoing_games:
-        if game['htNickName'] == 'Clippers' and datetime.today().strftime("%m/%d/%Y") == game['date']:
+    # Checks if there are any games playing live or if they are completed.
+    for game in ongoing_finished_games:
+        if game['htNickName'] == 'Clippers' and today == game['date']:
             print(
                 game_format.format(
                     gameID=game["gameID"],
@@ -217,24 +221,8 @@ def next_clippers_game():
 
 
 def check_opponent_missed_two_ft_in_4th_quarter(game_id):
-    # Get the play-by-play data for the game
-    play_by_play = playbyplayv2.PlayByPlayV2(game_id=game_id).get_data_frames()[0]
-
-    for index, row in play_by_play.iterrows():
-        event_msg_type = row['EVENTMSGTYPE']
-        period = row['PERIOD']
-        description = row['HOMEDESCRIPTION'] or row['VISITORDESCRIPTION'] or ''
-        team_name = 'Clippers' if row['PLAYER1_TEAM_ID'] == 1610612746 else 'Opponent'
-
-        # We are only interested in the 4th quarter (period 4)
-        if period == 4:
-            # Check for missed free throw events by the opponent
-            if event_msg_type == 3 and 'MISS' in description and '2 of 2' in description:
-                if team_name == 'Opponent':
-                    return True
-
     # This function displays the current games that are going on right now with live updates.
-    # It will send a message if the opponents of the clippers made at least 1 free throw in the 4th quarter.
+    # It will send a message if the opponents of the opponents missed 2 free throws in a row in the 4th quarter.
     pbp = playbyplay.PlayByPlay(game_id=game_id).get_dict()
     events = pbp['game']['actions']
 
@@ -243,41 +231,24 @@ def check_opponent_missed_two_ft_in_4th_quarter(game_id):
         description = event.get('description', '')
         team_abbreviation = event.get('teamTricode', '')
 
-        if period == 1:
-            # Check if the description matches a made FT
-            # if "1 of 2" in description or "1 of 3" in description:
-            if ("Free Throw 1 of 2" in description or "Free Throw 1 of 3" in description
-                    or "Free Throw 2 of 3" in description or "Free Throw 2 of 2" in description
-                    or "Free Throw 3 of 3" in description):
-                # Ensure it's the opponent's FT (not Clippers)
-                if team_abbreviation != 'LAC':  # Assuming Clippers' abbreviation is LAC
+        # We are only interested in the 4th quarter (period 4)
+        if period == 4:
+            # Check for missed free throw events by the opponent
+            if ('MISS' in description and 'Free Throw' in description
+                    and ('2 of 2' in description or '2 of 3' in description or '3 of 3' in description)):
+                if team_abbreviation != 'LAC':
                     return True
-
     return False
 
 
 # this function is made so that I can check whether the function handles arguments properly
 # It will send a message if the opponents of the clippers made at least 1 free throw in the 1st quarter.
 def check_opponent_made_one_ft_in_1st_quarter(game_id):
-    # Get the play-by-play data for the game
-    play_by_play = playbyplayv2.PlayByPlayV2(game_id=game_id).get_data_frames()[0]
-
-    for index, row in play_by_play.iterrows():
-        event_msg_type = row['EVENTMSGTYPE']
-        period = row['PERIOD']
-        description = row['HOMEDESCRIPTION'] or row['VISITORDESCRIPTION'] or ''
-        team_name = 'Clippers' if row['PLAYER1_TEAM_ID'] == 1610612746 else 'Opponent'
-
-        # We are only interested in the 1st quarter (period 4)
-        if period == 1:
-            # Check for missed free throw events by the opponent
-            if event_msg_type == 3 and ("1 of 2" in description or "1 of 3" in description):
-                if team_name == 'Opponent':
-                    return True
-
+    # receive the game play by plays by dict
     pbp = playbyplay.PlayByPlay(game_id=game_id).get_dict()
     events = pbp['game']['actions']
 
+    # loop through the play by plays to check if a free throw was made.
     for event in events:
         period = event.get('period', 0)
         description = event.get('description', '')
@@ -286,7 +257,8 @@ def check_opponent_made_one_ft_in_1st_quarter(game_id):
         if period == 1:
             # Check if the description matches a made FT
             # if "1 of 2" in description or "1 of 3" in description:
-            if "Free Throw" in description:
+            if ("Free Throw" in description
+                    and ("1 of 2" in description or "1 of 3" in description or "2 of 3" in description)):
                 # Ensure it's the opponent's FT (not Clippers)
                 if team_abbreviation != 'LAC':  # Assuming Clippers' abbreviation is LAC
                     print(description)
@@ -318,8 +290,8 @@ def send_notification(message):
 
 # # Run the asynchronous function using an event loop
 # async def main():
-#     print(check_game_finish())
-#     game_id = await get_games_schedule()
+#     print(await check_game_finish())
+#     game_id = await get_game_id_today()
 #     check_opponent_made_one_ft_in_1st_quarter(game_id)
 #     print(check_opponent_missed_two_ft_in_4th_quarter(game_id))
 #
