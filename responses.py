@@ -8,6 +8,7 @@ import LA_Angels
 import LA_Clippers
 
 
+# returns phrases the bot will respond with given a command
 async def get_response(user_input: str, bot_mention: str) -> str:
     # Remove bot mention from the user_input to get the actual command
     lowered = user_input.lower().replace(bot_mention, '').strip()
@@ -49,6 +50,7 @@ async def get_response(user_input: str, bot_mention: str) -> str:
         return 'I don\'t understand that command.'
 
 
+# returns the closest home game between the clippers, ducks, angels, and lafc
 async def next_chance():
     # Get upcoming game dates and opponents
     lafc_date, lafc_opp = LAFC.get_next_lafc_home_game()

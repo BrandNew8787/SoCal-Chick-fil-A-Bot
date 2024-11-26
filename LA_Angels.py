@@ -4,6 +4,7 @@ import aiohttp  # For asynchronous HTTP requests
 import requests
 
 
+# returns the date and opponent of the next angels game
 def get_next_angels_game():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID
@@ -35,6 +36,7 @@ def get_next_angels_game():
         return f"Failed to retrieve data. Status code: {response.status_code}"
 
 
+# returns a boolean whether there is an angels game today or not
 async def get_today_angels_home_game():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID
@@ -58,6 +60,7 @@ async def get_today_angels_home_game():
         return False
 
 
+# returns a boolean if the game is finished and if the angels scored 7 or more at a home game
 async def check_angels_score():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID

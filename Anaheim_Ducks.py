@@ -9,6 +9,7 @@ NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
 # NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-11-25"
 
 
+# Receives the next home game
 async def get_ducks_next_home_game():
     # Define the endpoint for the Ducks' schedule
     schedule_url = f"https://api-web.nhle.com/v1/club-schedule-season/ANA/now"
@@ -25,8 +26,7 @@ async def get_ducks_next_home_game():
     return "No upcoming home games found."
 
 
-# gameOutcome
-
+# Checks if there is a ducks home game today
 async def ducks_home_game_today():
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
@@ -54,6 +54,7 @@ async def ducks_away_game_today():
     return False
 
 
+# If there is a home game, checks if the ducks scored 5 points
 async def check_ducks_score():
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
@@ -71,7 +72,7 @@ async def check_ducks_score():
     return "The game hasn't finished yet!"
 
 
-# For testing the ducks games
+# For testing the ducks games, checks if the ducks scored 2 points at an away game
 async def check_ducks_away_score():
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:

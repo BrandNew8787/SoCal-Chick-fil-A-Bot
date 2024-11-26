@@ -121,7 +121,7 @@ async def get_game_id_today():
     return None
 
 
-# finds the next clippers game webscraping through the cbs sports website
+# Finds the next clippers game webscraping through the cbs sports website
 def get_next_clippers_home_game():
     # URL of the Clippers schedule page on CBS Sports
     url = "https://www.cbssports.com/nba/teams/LAC/los-angeles-clippers/schedule/regular/"
@@ -220,9 +220,9 @@ def next_clippers_game():
         print(f"Error fetching data: {e}")
 
 
-def check_opponent_missed_two_ft_in_4th_quarter(game_id):
-    # This function displays the current games that are going on right now with live updates.
+# This function displays the current games that are going on right now with live updates.
     # It will send a message if the opponents of the opponents missed 2 free throws in a row in the 4th quarter.
+def check_opponent_missed_two_ft_in_4th_quarter(game_id):
     pbp = playbyplay.PlayByPlay(game_id=game_id).get_dict()
     events = pbp['game']['actions']
 
