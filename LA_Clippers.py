@@ -1,10 +1,8 @@
-import asyncio
 import json
 from datetime import datetime, timezone
-from dateutil import parser
 import requests
 from bs4 import BeautifulSoup
-from nba_api.stats.endpoints import leaguegamefinder, playbyplayv2
+from nba_api.stats.endpoints import leaguegamefinder
 from nba_api.live.nba.endpoints import playbyplay
 
 

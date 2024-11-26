@@ -94,11 +94,11 @@ async def next_chance():
         return "No upcoming games found."
 
 
-async def main():
-    result = await get_response('next lafc game', 'bro')
-    print(result)
-
-
-# Run the async function using asyncio
-if __name__ == "__main__":
-    asyncio.run(main())
+# async def main():
+#     result = await get_response('next lafc game', 'bro')
+#     print(result)
+#
+#
+# # Run the async function using asyncio
+# if __name__ == "__main__":
+#     asyncio.run(main())
