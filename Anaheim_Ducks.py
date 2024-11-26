@@ -9,6 +9,19 @@ NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
 # NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-11-25"
 
 
+async def get_game_id():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(NHL_API_URL) as response:
+            data_nhl = await response.json()
+
+    # Check if it was a Ducks home game and they scored 5 points
+    daily_games = data_nhl['games']
+    for i in daily_games:
+        if i['homeTeam']['id'] == 24:
+            return i['id']
+    return None
+
+
 # Receives the next home game
 async def get_ducks_next_home_game():
     # Define the endpoint for the Ducks' schedule
@@ -45,8 +58,6 @@ async def ducks_away_game_today():
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
             data_nhl = await response.json()
-
-    # Check if it was a Ducks home game and they scored 5 points
     daily_games = data_nhl['games']
     for i in daily_games:
         if i['awayTeam']['id'] == 24:
@@ -90,17 +101,45 @@ async def check_ducks_away_score():
     return "The game hasn't finished yet!"
 
 
-# async def main():
-#     result = await get_ducks_next_home_game()
-#     print(result)
-#     # Uncomment if you want to run the check_ducks_score function
-#     score_result = await check_ducks_score()
-#     if score_result:
-#         print("Ducks scored 5 points!")
-#     else:
-#         print("The game hasn't finished, or they haven't scored 5 points yet.")
-#
-#
-# # Run the async function
-# if __name__ == "__main__":
-#     asyncio.run(main())
+# prints the most current score
+async def check_current_score(game_id):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play") as response:
+            data_nhl = await response.json()
+
+    # Check if it was a Ducks home game and they scored 5 points
+    away_score = ""
+    if 'score' in data_nhl['awayTeam']:
+        away_score = data_nhl['awayTeam']['score']
+    else:
+        away_score = "0"
+    away_team = data_nhl['awayTeam']['abbrev']
+    home_score = ""
+    if 'score' in data_nhl['homeTeam']:
+        home_score = data_nhl['homeTeam']['score']
+    else:
+        home_score = "0"
+    home_team = data_nhl['homeTeam']['abbrev']
+    period = data_nhl['periodDescriptor']['number']
+    clock = data_nhl['clock']['timeRemaining']
+
+    print(f"Current Score: \n\tClock: {clock}\n\tPeriod: {period}\n\t"
+          f"Score: ({away_team}) {away_score} - {home_score} ({home_team})\n")
+
+
+async def main():
+    id = await get_game_id()
+    await check_current_score(id)
+    result = await get_ducks_next_home_game()
+    print(result)
+    # Uncomment if you want to run the check_ducks_score function
+    score_result = await check_ducks_score()
+    if score_result:
+        print("Ducks scored 5 points!")
+    else:
+        print("The game hasn't finished, or they haven't scored 5 points yet.")
+
+
+# Run the async function
+if __name__ == "__main__":
+    asyncio.run(main())

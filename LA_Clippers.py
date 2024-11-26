@@ -6,6 +6,8 @@ import requests
 from bs4 import BeautifulSoup
 from nba_api.stats.endpoints import leaguegamefinder, playbyplayv2
 from nba_api.live.nba.endpoints import playbyplay
+import re
+
 
 
 # once the game is over, this function works!
@@ -74,7 +76,7 @@ async def get_game_id_today():
     season = datetime.today().strftime("%Y")
 
     # this is a date where the opponent of the clippers missed 2 free throws
-    # other_date = "11/18/2024"
+    # today = "11/18/2024"
 
     # URL to fetch the JSON data
     url = f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season}&RegionID=1&Date={today}&EST=Y"
@@ -221,7 +223,7 @@ def next_clippers_game():
 
 
 # This function displays the current games that are going on right now with live updates.
-    # It will send a message if the opponents of the opponents missed 2 free throws in a row in the 4th quarter.
+# It will send a message if the opponents of the opponents missed 2 free throws in a row in the 4th quarter.
 def check_opponent_missed_two_ft_in_4th_quarter(game_id):
     pbp = playbyplay.PlayByPlay(game_id=game_id).get_dict()
     events = pbp['game']['actions']
@@ -266,6 +268,24 @@ def check_opponent_made_one_ft_in_1st_quarter(game_id):
     return False
 
 
+# prints the most current score
+def check_score(game_id):
+    pbp = playbyplay.PlayByPlay(game_id=game_id).get_dict()
+    events = pbp['game']['actions']
+    last_play = events[-1]
+
+    period = last_play.get('period', 0)
+    clock = last_play.get('clock', '')
+    minutes = int(clock[2:4])  # Characters at index 2 and 3
+    seconds = int(clock[5:7])
+    description = last_play.get('description', '')
+    home_score = last_play.get('scoreHome', '')
+    away_score = last_play.get('scoreAway', '')
+
+    print(f"Current Score: \n\tClock: {minutes}:{seconds}\n\tPeriod: {period}\n\tDescription: {description}\n\t"
+          f"Score: (OPP) {away_score} - {home_score} (LAC)")
+
+
 def get_most_recent_clippers_home_game_vs_rockets():
     # Find the most recent game between the Clippers and the Rockets where the Clippers were the home team
     gamefinder = leaguegamefinder.LeagueGameFinder(team_id_nullable=1610612746)  # Clippers team ID
@@ -288,17 +308,16 @@ def send_notification(message):
     # Here you can implement the code to send notifications via email, SMS, etc.
 
 
-# # Run the asynchronous function using an event loop
-# async def main():
-#     print(await check_game_finish())
-#     game_id = await get_game_id_today()
-#     check_opponent_made_one_ft_in_1st_quarter(game_id)
-#     print(check_opponent_missed_two_ft_in_4th_quarter(game_id))
-#
-#
-# # Run the async function
-# if __name__ == "__main__":
-#     asyncio.run(main())
+# Run the asynchronous function using an event loop
+async def main():
+    print(await check_game_finish())
+    game_id = await get_game_id_today()
+    check_score(game_id)
+
+
+# Run the async function
+if __name__ == "__main__":
+    asyncio.run(main())
 
 
 # # Main logic to check and notify
