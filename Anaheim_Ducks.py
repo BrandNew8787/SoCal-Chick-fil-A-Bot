@@ -6,6 +6,7 @@ import aiohttp  # For asynchronous HTTP requests
 today = datetime.today().strftime('%Y-%m-%d')
 NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
 # NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-04-18"
+# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-11-25"
 
 
 async def get_ducks_next_home_game():
@@ -62,8 +63,8 @@ async def check_ducks_score():
     daily_games = data_nhl['games']
     for i in daily_games:
         if i['homeTeam']['id'] == 24:
-            if 'scores' in i['homeTeam'] and 'gameOutcome' in i:
-                if i['homeTeam']['scores'] >= 5:
+            if 'score' in i['homeTeam'] and 'gameOutcome' in i:
+                if i['homeTeam']['score'] >= 5:
                     return True
                 else:
                     return False
@@ -92,11 +93,11 @@ async def check_ducks_away_score():
 #     result = await get_ducks_next_home_game()
 #     print(result)
 #     # Uncomment if you want to run the check_ducks_score function
-#     # score_result = await check_ducks_score()
-#     # if score_result:
-#     #     print("Ducks scored 5 points!")
-#     # else:
-#     #     print("The game hasn't finished, or they haven't scored 5 points yet.")
+#     score_result = await check_ducks_score()
+#     if score_result:
+#         print("Ducks scored 5 points!")
+#     else:
+#         print("The game hasn't finished, or they haven't scored 5 points yet.")
 #
 #
 # # Run the async function

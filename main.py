@@ -86,8 +86,12 @@ async def periodic_check():
             if lafc_results != "The game has not finished yet!":
                 if lafc_results['outcome'] == "Win":
                     await channel.send(
-                        "LAFC has won their home game! Free Chick-fil-A sandwich! Open "
+                        "@everyone LAFC has won their home game! Free Chick-fil-A sandwich! Open "
                         "[here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!"
+                    )
+                else:
+                    await channel.send(
+                        "LAFC did not win... no free sandwich today..."
                     )
 
                 # Game is over, reset the state
@@ -110,8 +114,13 @@ async def periodic_check():
 
                     # changed the message to state and away game had happened
                     await channel.send(
-                        "The Anaheim Ducks have scored 5 or more goals at a home game! Free Chick-fil-A sandwich! Open"
-                        "[here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!"
+                        "@everyone The Anaheim Ducks have scored 5 or more goals at a home game! Free Chick-fil-A "
+                        "sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your "
+                        "sandwich!"
+                    )
+                else:
+                    await channel.send(
+                        "The Anaheim Ducks did not score 5 points... no free sandwich today..."
                     )
 
                 # Game is over, reset the state
@@ -131,9 +140,13 @@ async def periodic_check():
 
                     # changed this so that it checks if the opponent made one basket or not
                     await channel.send(
-                        "The opponents of the Los Angeles Clippers missed 2 free throw at a home game! Free"
+                        "@everyone The opponents of the Los Angeles Clippers missed 2 free throw at a home game! Free"
                         "Chick-fil-A sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to "
                         "claim your sandwich!"
+                    )
+                else:
+                    await channel.send(
+                        "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich today..."
                     )
 
                 # Game is over, reset the state
@@ -169,8 +182,12 @@ async def periodic_check():
             if angels_result != "The game has not finished yet!":
                 if angels_result:
                     await channel.send(
-                        "The Los Angeles Angels have scored 7 points! Free Chick-fil-A sandwich!"
+                        "@everyone The Los Angeles Angels have scored 7 points! Free Chick-fil-A sandwich!"
                         " Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!"
+                    )
+                else:
+                    await channel.send(
+                        "The Angels did not score 7 points... no free sandwich today..."
                     )
 
                 # Game is over, reset the state
