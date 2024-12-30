@@ -6,8 +6,6 @@ import requests
 from bs4 import BeautifulSoup
 from nba_api.stats.endpoints import leaguegamefinder, playbyplayv2
 from nba_api.live.nba.endpoints import playbyplay
-import re
-
 
 
 # once the game is over, this function works!
@@ -124,7 +122,8 @@ async def get_game_id_today():
 
 
 # Finds the next clippers game webscraping through the cbs sports website
-def get_next_clippers_home_game():
+# THIS FUNCTION IS LESS EFFICIENT
+def next_clippers_home_game():
     # URL of the Clippers schedule page on CBS Sports
     url = "https://www.cbssports.com/nba/teams/LAC/los-angeles-clippers/schedule/regular/"
 
@@ -150,30 +149,31 @@ def get_next_clippers_home_game():
     # Find all <script> tags with type "application/ld+json"
     script_tags = soup.find_all('script', type='application/ld+json')
 
+    # this is today's date used to compare game dates
+    today_date = datetime.now().date()
+
     # Iterate over all <script> tags found
     for script in script_tags:
         try:
             # Attempt to load the JSON content, stripping problematic characters
             json_data = json.loads(script.string.replace('\n', '').replace('\r', '').replace('\t', ''))
 
-            # Check if the JSON data is a SportsEvent and if it involves the Clippers
-            if json_data.get('@type') == 'SportsEvent':
+            # Checking if the game is a home game
+            if json_data.get('location')['name'] == "Intuit Dome":
                 teams = json_data.get('competitor', [])
-                for team in teams:
-                    if 'Clippers' in team.get('name', ''):
-                        # Extract relevant information
-                        game_date_str = json_data.get('startDate').strip()
-                        game_date = datetime.strptime(game_date_str, "%b %d, %Y")
 
-                        # Format the date as %Y-%m-%d
-                        formatted_game_date = game_date.strftime("%Y-%m-%d")
+                # Extract relevant information
+                game_date_str = json_data.get('startDate').strip()
+                game_date = datetime.strptime(game_date_str, "%b %d, %Y")
 
-                        # Compare game date with today's date
-                        if game_date.date() >= datetime.now().date():
-                            return formatted_game_date, teams[0]['name'] if 'Clippers' not in teams[0]['name'] else \
-                                teams[1]['name']
+                # Format the date as %Y-%m-%d
+                formatted_game_date = game_date.strftime("%Y-%m-%d")
 
-                        break
+                # Compare game date with today's date
+                if game_date.date() >= today_date:
+                    return formatted_game_date, teams[0]['name'] if 'Clippers' not in teams[0]['name'] else \
+                        teams[1]['name']
+
         except json.JSONDecodeError:
             # Handle JSON parsing errors
             print("Failed to parse JSON data.")
@@ -185,7 +185,7 @@ def get_next_clippers_home_game():
 
 
 # finds the next clippers home game parsing through a json file
-def next_clippers_game():
+def get_next_clippers_home_game():
     # URL for the NBA schedule JSON data
     url = "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json"
 
@@ -311,6 +311,8 @@ def send_notification(message):
 # Run the asynchronous function using an event loop
 async def main():
     print(await check_game_finish())
+    print(get_next_clippers_home_game())
+    print(next_clippers_home_game())
     game_id = await get_game_id_today()
     check_score(game_id)
 
@@ -318,7 +320,6 @@ async def main():
 # Run the async function
 if __name__ == "__main__":
     asyncio.run(main())
-
 
 # # Main logic to check and notify
 # print(get_next_clippers_home_game())

@@ -133,6 +133,8 @@ async def periodic_check():
 
         if LA_Clippers_game:
             print("There's a Clipper's game today!")
+
+            # This is to ensure that the game is over before checking if the conditions were met
             clippers_result = await LA_Clippers.check_game_finish()
             if clippers_result == "W" or clippers_result == "L":
                 clippers_4th_quarter = LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
