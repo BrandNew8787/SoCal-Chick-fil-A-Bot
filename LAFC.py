@@ -92,31 +92,6 @@ def game_today():
         return f"Failed to retrieve the page. Status code: {response.status_code}"
 
 
-# prints the result of a past game
-def past_game(game):
-    for row in game:
-        date = row.find('td', {'data-index': '0'}).get_text(strip=True)
-        opponent_info = row.find('td', {'data-index': '1'})
-        opponent = opponent_info.find('a', class_='table-entity-name').get_text(strip=True)
-        results = row.find('td', {'data-index': '2'}).get_text(strip=True)
-        # Determine home or away based on the result format
-        if results.startswith('W'):
-            # Split the result on the dash to get the scores
-            score_parts = results[1:].split('-')
-            if len(score_parts) == 2:
-                if score_parts[0] > score_parts[1]:
-                    location = "H"
-                else:
-                    location = "A"
-            else:
-                location = "Unknown"
-        else:
-            location = "Unknown"
-
-        print(
-            f"Date: {date}, Opponent: {opponent} ({location}), Results: {results}")
-
-
 # returns a string value of the date, time, and opponent of the next lafc home game.
 def upcoming_game(game):
     for row in game:
@@ -218,16 +193,3 @@ def get_match_results():
 
     else:
         return f"Failed to retrieve the page. Status code: {response.status_code}"
-
-
-# # URL of the ESPN page
-# url = "https://www.espn.com/soccer/team/results/_/id/18966/usa.lafc"
-#
-# # Get the match results
-# matches = get_match_results()
-#
-# # Check the type and structure of `matches` if isinstance(matches, list): for match in matches: print( f"Date: {
-# match['date']}, Match: {match['home_team']} vs {match['away_team']}, Result: {match['result']}, Outcome: {match[
-# 'outcome']}") else: # Print the error message if the function didn't return a list print(matches)
-
-

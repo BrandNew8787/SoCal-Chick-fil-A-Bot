@@ -81,7 +81,6 @@ async def periodic_check():
         ongoing_games = False
 
         if LAFC_game:
-            print("There's a LAFC game today!")
             lafc_results = await LAFC.get_match_results()
             if lafc_results != "The game has not finished yet!":
                 if lafc_results['outcome'] == "Win":
@@ -99,11 +98,9 @@ async def periodic_check():
                 ongoing_games = False
 
             else:
-                print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         if ANA_Ducks_game:
-            print("There's a Duck's game today!")
             # FOR MAIN FUNCTION
             today_ducks_game = Anaheim_Ducks.get_game_id()
             ducks_results = await Anaheim_Ducks.check_ducks_score(today_ducks_game)
@@ -129,12 +126,9 @@ async def periodic_check():
                 ongoing_games = False
 
             else:
-                print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         if LA_Clippers_game:
-            print("There's a Clipper's game today!")
-
             # This is to ensure that the game is over before checking if the conditions were met
             clippers_result = await LA_Clippers.check_game_finish()
             if clippers_result == "W" or clippers_result == "L":
@@ -157,7 +151,6 @@ async def periodic_check():
                 ongoing_games = False
 
             else:
-                print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
             '''
@@ -180,7 +173,6 @@ async def periodic_check():
             #     ongoing_games = False
 
         if LA_Angels_game:
-            print("There's an Angels Game today!")
             angels_result = await LA_Angels.check_angels_score()
             if angels_result != "The game has not finished yet!":
                 if angels_result:
@@ -198,14 +190,12 @@ async def periodic_check():
                 ongoing_games = False
 
             else:
-                print("The game has not finished yet!")
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         # If there are still ongoing games, wait for 10 minutes before checking again
         if ongoing_games:
             await asyncio.sleep(600)  # Wait for 10 minutes before checking again
         else:
-            print("There are no home games today!")
             await asyncio.sleep(21600)  # Wait for 6 hours before checking for new games
 
 

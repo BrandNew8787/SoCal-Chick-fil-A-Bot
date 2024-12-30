@@ -94,13 +94,3 @@ async def next_chance():
                 f"\n\tGAME: {closest_team} vs {closest_opponent} \n\tDATE: {closest_date.strftime('%b %d, %Y')}")
     else:
         return "No upcoming games found."
-
-
-async def main():
-    result = await get_response('next lafc game', 'bro')
-    print(result)
-
-
-# Run the async function using asyncio
-if __name__ == "__main__":
-    asyncio.run(main())
