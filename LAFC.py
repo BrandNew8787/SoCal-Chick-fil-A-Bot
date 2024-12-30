@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 
 
+# # returns the date and opponent of the next scheduled lafc game
 def get_next_lafc_home_game():
     # URL of the page: eventually this website will need to be changed when the new schedule comes out
     url = ("https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
@@ -42,12 +43,12 @@ def get_next_lafc_home_game():
                         opponent = row.find('td', {'data-stat': 'opponent'}).text.strip()
                         return match_date.strftime('%Y-%m-%d'), opponent
 
-        return "No upcoming LAFC home games found."
+        return "No upcoming LAFC home games found.", None
     else:
         return f"Failed to retrieve the page. Status code: {response.status_code}"
 
 
-# returns True or False if there is a home game today
+# returns a boolean if there is a home game today
 def game_today():
     # URL of the page
     url = ("https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
@@ -91,6 +92,7 @@ def game_today():
         return f"Failed to retrieve the page. Status code: {response.status_code}"
 
 
+# prints the result of a past game
 def past_game(game):
     for row in game:
         date = row.find('td', {'data-index': '0'}).get_text(strip=True)
@@ -115,6 +117,7 @@ def past_game(game):
             f"Date: {date}, Opponent: {opponent} ({location}), Results: {results}")
 
 
+# returns a string value of the date, time, and opponent of the next lafc home game.
 def upcoming_game(game):
     for row in game:
         date = row.find('td', {'data-index': '0'}).get_text(strip=True)
@@ -141,6 +144,7 @@ def upcoming_game(game):
             return f"Next LAFC Home Game:\n\tDate: {date}\n\tOpponent: {opponent}\n\tTime: {time_info}"
 
 
+# returns the results of a today's game
 def get_match_results():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
