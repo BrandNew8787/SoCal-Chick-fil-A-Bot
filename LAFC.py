@@ -226,4 +226,4 @@ def get_match_results():
 # match['date']}, Match: {match['home_team']} vs {match['away_team']}, Result: {match['result']}, Outcome: {match[
 # 'outcome']}") else: # Print the error message if the function didn't return a list print(matches)
 
-# print(get_next_lafc_home_game())
+
