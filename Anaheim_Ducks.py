@@ -4,9 +4,12 @@ from datetime import datetime
 import aiohttp  # For asynchronous HTTP requests
 
 today = datetime.today().strftime('%Y-%m-%d')
-NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
+# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
 # NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-04-18"
 # NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-11-25"
+
+# shootout game id = 2024020392
+NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-12-01"
 
 
 async def get_game_id():
@@ -66,7 +69,8 @@ async def ducks_away_game_today():
 
 
 # If there is a home game, checks if the ducks scored 5 points
-async def check_ducks_score():
+# THIS DOES NOT ACCOUNT FOR SHOOT OUTS
+async def check_ducks_score_non_shootout():
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
             data_nhl = await response.json()
@@ -81,6 +85,47 @@ async def check_ducks_score():
                 else:
                     return False
     return "The game hasn't finished yet!"
+
+
+# returns true if the ducks have scored 5 or more goals including shootouts
+async def check_ducks_score(game_id):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play") as response:
+            data_nhl = await response.json()
+
+    result = data_nhl['plays'][-1]['typeDescKey']
+    if data_nhl['plays'][-1]['typeDescKey'] == 'game-end':
+        # Check if it was a Ducks home game and they scored 5 points
+        away_score = int
+        if 'score' in data_nhl['awayTeam']:
+            away_score = data_nhl['awayTeam']['score']
+        else:
+            away_score = 0
+        away_team = data_nhl['awayTeam']['abbrev']
+        home_score = int
+        if 'score' in data_nhl['homeTeam']:
+            home_score = data_nhl['homeTeam']['score']
+        else:
+            home_score = 0
+
+        if data_nhl['shootoutInUse']:
+            so_score = 0
+            for plays in data_nhl['plays']:
+                if plays['periodDescriptor']['periodType'] == 'SO':
+                    if plays['typeDescKey'] == 'goal' and plays['details']['eventOwnerTeamId'] == 24:
+                        so_score += 1
+            if home_score > away_score:
+                if home_score - 1 + so_score >= 5:
+                    return True
+            else:
+                return False
+        else:
+            if home_score >= 5:
+                return True
+            else:
+                return False
+    else:
+        return "The game hasn't finished yet!"
 
 
 # For testing the ducks games, checks if the ducks scored 2 points at an away game
@@ -133,7 +178,7 @@ async def main():
     result = await get_ducks_next_home_game()
     print(result)
     # Uncomment if you want to run the check_ducks_score function
-    score_result = await check_ducks_score()
+    score_result = await check_ducks_score_updated(id)
     if score_result:
         print("Ducks scored 5 points!")
     else:
