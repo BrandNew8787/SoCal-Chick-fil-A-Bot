@@ -138,8 +138,9 @@ async def check_ducks_away_score():
     daily_games = data_nhl['games']
     for i in daily_games:
         if i['awayTeam']['id'] == 24:
-            if 'scores' in i['awayTeam'] and 'gameOutcome' in i:
-                if i['awayTeam']['scores'] >= 2:
+            # THERE IS A TYPO WITH SCORE!!!! PLEASE FIX TMRW!
+            if 'score' in i['awayTeam'] and 'gameOutcome' in i:
+                if i['awayTeam']['score'] >= 2:
                     return True
                 else:
                     return False
