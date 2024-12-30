@@ -102,7 +102,7 @@ async def periodic_check():
 
         if ANA_Ducks_game:
             # FOR MAIN FUNCTION
-            today_ducks_game = Anaheim_Ducks.get_game_id()
+            today_ducks_game = await Anaheim_Ducks.get_game_id()
             ducks_results = await Anaheim_Ducks.check_ducks_score(today_ducks_game)
 
             # added a function to check the away score to make sure this is working
