@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
-
 import aiohttp  # For asynchronous HTTP requests
 import requests
 
 
+# returns the date and opponent of the next angels game
 def get_next_angels_game():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID
@@ -11,6 +11,7 @@ def get_next_angels_game():
     next_year = today + timedelta(days=365)
     url = (f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId={team_id}"
            f"&startDate={today.strftime('%Y-%m-%d')}&endDate={next_year.strftime('%Y-%m-%d')}")
+    "2024-09-29"
 
     # Send a GET request to the API
     response = requests.get(url)
@@ -35,6 +36,7 @@ def get_next_angels_game():
         return f"Failed to retrieve data. Status code: {response.status_code}"
 
 
+# returns a boolean whether there is an angels game today or not
 async def get_today_angels_home_game():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID
@@ -58,6 +60,7 @@ async def get_today_angels_home_game():
         return False
 
 
+# returns a boolean if the game is finished and if the angels scored 7 or more at a home game
 async def check_angels_score():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID
@@ -84,14 +87,15 @@ async def check_angels_score():
     return False
 
 
-# # Run the asynchronous function using an event loop
-# async def main():
-#     result = await check_angels_score()
-#     print(result)
-#
-#
-# # Run the async function
-# if __name__ == "__main__":
-#     asyncio.run(main())
-#
-# print(get_next_angels_game())
+# Returns today's game ID
+async def get_game_id():
+    # Set up the API URL with the necessary parameters
+    team_id = 108  # Los Angeles Angels team ID
+    today = datetime.today().strftime('%Y-%m-%d')
+    url = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId={team_id}&startDate={today}&endDate={today}"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            data_mlb = await response.json()
+
+    return data_mlb['dates'][0]['games'][0]['gamePk']

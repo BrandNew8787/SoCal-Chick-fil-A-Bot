@@ -8,6 +8,7 @@ import LA_Angels
 import LA_Clippers
 
 
+# returns phrases the bot will respond with given a command
 async def get_response(user_input: str, bot_mention: str) -> str:
     # Remove bot mention from the user_input to get the actual command
     lowered = user_input.lower().replace(bot_mention, '').strip()
@@ -92,13 +93,3 @@ async def next_chance():
                 f"\n\tGAME: {closest_team} vs {closest_opponent} \n\tDATE: {closest_date.strftime('%b %d, %Y')}")
     else:
         return "No upcoming games found."
-
-
-# async def main():
-#     result = await get_response('next lafc game', 'bro')
-#     print(result)
-#
-#
-# # Run the async function using asyncio
-# if __name__ == "__main__":
-#     asyncio.run(main())

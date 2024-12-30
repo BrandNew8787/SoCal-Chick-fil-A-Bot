@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 
 
+# # returns the date and opponent of the next scheduled lafc game
 def get_next_lafc_home_game():
     # URL of the page: eventually this website will need to be changed when the new schedule comes out
     url = ("https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
@@ -47,7 +48,7 @@ def get_next_lafc_home_game():
         return f"Failed to retrieve the page. Status code: {response.status_code}"
 
 
-# returns True or False if there is a home game today
+# returns a boolean if there is a home game today
 def game_today():
     # URL of the page
     url = ("https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
@@ -91,30 +92,7 @@ def game_today():
         return f"Failed to retrieve the page. Status code: {response.status_code}"
 
 
-def past_game(game):
-    for row in game:
-        date = row.find('td', {'data-index': '0'}).get_text(strip=True)
-        opponent_info = row.find('td', {'data-index': '1'})
-        opponent = opponent_info.find('a', class_='table-entity-name').get_text(strip=True)
-        results = row.find('td', {'data-index': '2'}).get_text(strip=True)
-        # Determine home or away based on the result format
-        if results.startswith('W'):
-            # Split the result on the dash to get the scores
-            score_parts = results[1:].split('-')
-            if len(score_parts) == 2:
-                if score_parts[0] > score_parts[1]:
-                    location = "H"
-                else:
-                    location = "A"
-            else:
-                location = "Unknown"
-        else:
-            location = "Unknown"
-
-        print(
-            f"Date: {date}, Opponent: {opponent} ({location}), Results: {results}")
-
-
+# returns a string value of the date, time, and opponent of the next lafc home game.
 def upcoming_game(game):
     for row in game:
         date = row.find('td', {'data-index': '0'}).get_text(strip=True)
@@ -141,6 +119,7 @@ def upcoming_game(game):
             return f"Next LAFC Home Game:\n\tDate: {date}\n\tOpponent: {opponent}\n\tTime: {time_info}"
 
 
+# returns the results of a today's game
 def get_match_results():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -214,16 +193,3 @@ def get_match_results():
 
     else:
         return f"Failed to retrieve the page. Status code: {response.status_code}"
-
-
-# # URL of the ESPN page
-# url = "https://www.espn.com/soccer/team/results/_/id/18966/usa.lafc"
-#
-# # Get the match results
-# matches = get_match_results()
-#
-# # Check the type and structure of `matches` if isinstance(matches, list): for match in matches: print( f"Date: {
-# match['date']}, Match: {match['home_team']} vs {match['away_team']}, Result: {match['result']}, Outcome: {match[
-# 'outcome']}") else: # Print the error message if the function didn't return a list print(matches)
-
-# print(get_next_lafc_home_game())
