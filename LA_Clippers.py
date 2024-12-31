@@ -4,13 +4,10 @@ from nba_api.stats.endpoints import leaguegamefinder
 from nba_api.live.nba.endpoints import playbyplay
 
 
-# once the game is over, this function works!
+# use only if the game is finished
 async def check_game_finish():
     # Get today's date in the correct format
     today_date = datetime.today().strftime('%m/%d/%Y')
-
-    # this is a date where the opponent of the clippers missed 2 free throws
-    # other_date = "11/18/2024"
 
     try:
         # Simple test request to see if the API is reachable
@@ -69,9 +66,6 @@ async def get_game_id_today():
     today = datetime.today().strftime("%m/%d/%Y")
     season = datetime.today().strftime("%Y")
 
-    # this is a date where the opponent of the clippers missed 2 free throws
-    # today = "11/18/2024"
-
     # URL to fetch the JSON data
     url = f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season}&RegionID=1&Date={today}&EST=Y"
 
@@ -84,35 +78,13 @@ async def get_game_id_today():
     # Extract either live or finished games
     ongoing_finished_games = data["resultSets"][1]["CompleteGameList"]
 
-    # Format and print the games
-    print("NBA Games for 11/20/2024:")
-    game_format = "{gameID}: {awayTeam} vs. {homeTeam} @ {gameTime} ({broadcaster})"
-
     for game in future_games:
         if game['htNickName'] == 'Clippers' and datetime.today().strftime("%m/%d/%Y") == game['date']:
-            print(
-                game_format.format(
-                    gameID=game["gameID"],
-                    awayTeam=f"{game['vtCity']} {game['vtNickName']}",
-                    homeTeam=f"{game['htCity']} {game['htNickName']}",
-                    gameTime=game["time"],
-                    broadcaster=", ".join([b["broadcasterName"] for b in game["broadcasters"]])
-                )
-            )
             return game["gameID"]
 
     # Checks if there are any games playing live or if they are completed.
     for game in ongoing_finished_games:
         if game['htNickName'] == 'Clippers' and today == game['date']:
-            print(
-                game_format.format(
-                    gameID=game["gameID"],
-                    awayTeam=f"{game['vtCity']} {game['vtNickName']}",
-                    homeTeam=f"{game['htCity']} {game['htNickName']}",
-                    gameTime=game["time"],
-                    broadcaster=f", {game['broadcasterName']}"
-                )
-            )
             return game["gameID"]
     return None
 
