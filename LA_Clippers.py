@@ -103,7 +103,7 @@ def get_next_clippers_home_game():
         data = response.json()
 
         # Example: Extracting all games
-        games = data.get('leagueSchedule', {}).get('gameDates', [])
+        games = data['leagueSchedule']['gameDates']
 
         for game_date in games:
             # Parse and reformat the date
@@ -113,11 +113,11 @@ def get_next_clippers_home_game():
             # Get the date part only
             game_date_only = game_datetime.date()
 
-            for game in game_date.get('games', []):
-                if (game.get('homeTeam', {}).get('teamName', 'N/A') == "Clippers"
+            for game in game_date['games']:
+                if (game['homeTeam']['teamName'] == "Clippers"
                         and game_date_only >= datetime.now().date()):
-                    home_team = game.get('homeTeam', {}).get('teamName', 'N/A')
-                    away_team = game.get('awayTeam', {}).get('teamName', 'N/A')
+                    home_team = game['homeTeam']['teamName']
+                    away_team = game['awayTeam']['teamCity'] + " " + game['awayTeam']['teamName']
                     formatted_date = datetime.strptime(original_date, '%m/%d/%Y %H:%M:%S').strftime('%Y-%m-%d')
                     return formatted_date, away_team
 

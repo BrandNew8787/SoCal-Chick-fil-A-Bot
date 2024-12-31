@@ -30,7 +30,7 @@ async def get_ducks_next_home_game():
 
     for row in schedule_data['games']:
         if row['homeTeam']['id'] == 24 and row['gameDate'] >= today_home:
-            return row['gameDate'], row['awayTeam']['placeName']['default']
+            return row['gameDate'], row['awayTeam']['placeName']['default'], row['awayTeam']['commonName']['default']
 
     return "No upcoming home games found."
 
