@@ -1,20 +1,8 @@
-import asyncio
 from datetime import datetime
-
 import aiohttp  # For asynchronous HTTP requests
 
 today = datetime.today().strftime('%Y-%m-%d')
 NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
-
-
-# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-04-18"
-# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-11-25"
-
-# Anaheim Ducks scored 5 points this day
-# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-12-29"
-
-# shootout game id = 2024020392
-# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-12-01"
 
 
 async def get_game_id():
@@ -71,25 +59,6 @@ async def ducks_away_game_today():
         if i['awayTeam']['id'] == 24:
             return True
     return False
-
-
-# If there is a home game, checks if the ducks scored 5 points
-# THIS DOES NOT ACCOUNT FOR SHOOT OUTS
-async def check_ducks_score_non_shootout():
-    async with aiohttp.ClientSession() as session:
-        async with session.get(NHL_API_URL) as response:
-            data_nhl = await response.json()
-
-    # Check if it was a Ducks home game and they scored 5 points
-    daily_games = data_nhl['games']
-    for i in daily_games:
-        if i['homeTeam']['id'] == 24:
-            if 'score' in i['homeTeam'] and 'gameOutcome' in i:
-                if i['homeTeam']['score'] >= 5:
-                    return True
-                else:
-                    return False
-    return "The game hasn't finished yet!"
 
 
 # returns true if the ducks have scored 5 or more goals including shootouts
