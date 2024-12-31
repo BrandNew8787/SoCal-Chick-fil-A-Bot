@@ -101,11 +101,10 @@ async def periodic_check():
                 ongoing_games = True  # Game is still ongoing, continue checking
 
         if ANA_Ducks_game:
-            # FOR MAIN FUNCTION
+            # find the game ID for today
             today_ducks_game = await Anaheim_Ducks.get_game_id()
             ducks_results = await Anaheim_Ducks.check_ducks_score(today_ducks_game)
 
-            # ducks_away_results = await Anaheim_Ducks.check_ducks_away_score()
             if ducks_results != "The game hasn't finished yet!":
                 if ducks_results:
 
