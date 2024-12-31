@@ -4,12 +4,17 @@ from datetime import datetime
 import aiohttp  # For asynchronous HTTP requests
 
 today = datetime.today().strftime('%Y-%m-%d')
-# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
+NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
+
+
 # NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-04-18"
 # NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-11-25"
 
+# Anaheim Ducks scored 5 points this day
+# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-12-29"
+
 # shootout game id = 2024020392
-NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-12-01"
+# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/2024-12-01"
 
 
 async def get_game_id():
@@ -93,37 +98,31 @@ async def check_ducks_score(game_id):
         async with session.get(f"https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play") as response:
             data_nhl = await response.json()
 
-    result = data_nhl['plays'][-1]['typeDescKey']
-    if data_nhl['plays'][-1]['typeDescKey'] == 'game-end':
-        # Check if it was a Ducks home game and they scored 5 points
-        away_score = int
-        if 'score' in data_nhl['awayTeam']:
-            away_score = data_nhl['awayTeam']['score']
-        else:
-            away_score = 0
-        away_team = data_nhl['awayTeam']['abbrev']
-        home_score = int
-        if 'score' in data_nhl['homeTeam']:
+    # check if the game has started or not
+    if len(data_nhl['plays']) != 0:
+        if data_nhl['plays'][-1]['typeDescKey'] == 'game-end':
             home_score = data_nhl['homeTeam']['score']
-        else:
-            home_score = 0
 
-        if data_nhl['shootoutInUse']:
-            so_score = 0
-            for plays in data_nhl['plays']:
-                if plays['periodDescriptor']['periodType'] == 'SO':
-                    if plays['typeDescKey'] == 'goal' and plays['details']['eventOwnerTeamId'] == 24:
-                        so_score += 1
-            if home_score > away_score:
+            if data_nhl['plays'][-1]['periodDescriptor']['periodType'] == 'SO':
+                so_score = 0
+                for plays in reversed(data_nhl['plays']):
+                    if plays['periodDescriptor']['periodType'] == 'SO':
+                        if plays['typeDescKey'] == 'goal' and plays['details']['eventOwnerTeamId'] == 24:
+                            so_score += 1
+                    else:
+                        break
+
                 if home_score - 1 + so_score >= 5:
                     return True
+                else:
+                    return False
             else:
-                return False
+                if home_score >= 5:
+                    return True
+                else:
+                    return False
         else:
-            if home_score >= 5:
-                return True
-            else:
-                return False
+            return "The game hasn't finished yet!"
     else:
         return "The game hasn't finished yet!"
 
