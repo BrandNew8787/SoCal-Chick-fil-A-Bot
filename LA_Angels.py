@@ -129,8 +129,7 @@ async def check_current_score(game_id):
 
 # Run the asynchronous function using an event loop
 async def main():
-    result = await get_game_id()
-    await check_current_score(result)
+    get_next_angels_game()
 
 
 # Run the async function

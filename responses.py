@@ -29,12 +29,12 @@ async def get_response(user_input: str, bot_mention: str) -> str:
     elif 'next clippers game' in lowered:
         clippers_date, clippers_opp = LA_Clippers.get_next_clippers_home_game()
         clippers_date = datetime.strptime(clippers_date, "%Y-%m-%d") if clippers_date else None
-        return (f"The next Clippers Home Game:\n\tGAME: Clippers vs. {clippers_opp}"
+        return (f"The next Clippers Home Game:\n\tGAME: Los Angeles Clippers vs. {clippers_opp}"
                 f"\n\tDATE: {clippers_date.strftime('%b %d, %Y')}")
     elif 'next ducks game' in lowered:
         duck_date, duck_opp = await Anaheim_Ducks.get_ducks_next_home_game()  # Await here
         duck_date = datetime.strptime(duck_date, "%Y-%m-%d") if duck_date else None
-        return f"The next Ducks Home Game:\n\tGAME: Ducks vs. {duck_opp}\n\tDATE: {duck_date.strftime('%b %d, %Y')}"
+        return f"The next Ducks Home Game:\n\tGAME: Anaheim Ducks vs. {duck_opp}\n\tDATE: {duck_date.strftime('%b %d, %Y')}"
     elif 'next lafc game' in lowered:
         lafc_date, lafc_opp = LAFC.get_next_lafc_home_game()
         if lafc_date == "No upcoming LAFC home games found." :
@@ -45,7 +45,7 @@ async def get_response(user_input: str, bot_mention: str) -> str:
     elif 'next angels game' in lowered:
         angels_date, angels_opp = LA_Angels.get_next_angels_game()
         angels_date = datetime.strptime(angels_date, "%Y-%m-%d") if angels_date else None
-        return f"The next Angels Home Game:\n\tGAME: LAFC vs. {angels_opp}\n\tDATE: {angels_date.strftime('%b %d, %Y')}"
+        return f"The next Angels Home Game:\n\tGAME: Los Angeles Angels vs. {angels_opp}\n\tDATE: {angels_date.strftime('%b %d, %Y')}"
     else:
         return 'I don\'t understand that command.'
 
@@ -54,7 +54,7 @@ async def get_response(user_input: str, bot_mention: str) -> str:
 async def next_chance():
     # Get upcoming game dates and opponents
     lafc_date, lafc_opp = LAFC.get_next_lafc_home_game()
-    duck_date, duck_opp = await Anaheim_Ducks.get_ducks_next_home_game()  # Await here
+    duck_date, duck_opp_loc, duck_opp = await Anaheim_Ducks.get_ducks_next_home_game()  # Await here
     angels_date, angels_opp = LA_Angels.get_next_angels_game()
     clippers_date, clippers_opp = LA_Clippers.get_next_clippers_home_game()
 
@@ -69,9 +69,9 @@ async def next_chance():
     # Create a dictionary to store team and game data
     game_data = {
         "LAFC": {"date": lafc_date, "opponent": lafc_opp},
-        "Ducks": {"date": duck_date, "opponent": duck_opp},
-        "Angels": {"date": angels_date, "opponent": angels_opp},
-        "Clippers": {"date": clippers_date, "opponent": clippers_opp},
+        "Anaheim Ducks": {"date": duck_date, "opponent": duck_opp_loc + " " + duck_opp},
+        "Los Angeles Angels": {"date": angels_date, "opponent": angels_opp},
+        "Los Angeles Clippers": {"date": clippers_date, "opponent": clippers_opp},
     }
 
     # Find the team with the closest upcoming game
