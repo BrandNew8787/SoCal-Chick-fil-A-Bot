@@ -105,7 +105,6 @@ async def periodic_check():
             today_ducks_game = await Anaheim_Ducks.get_game_id()
             ducks_results = await Anaheim_Ducks.check_ducks_score(today_ducks_game)
 
-            # added a function to check the away score to make sure this is working
             # ducks_away_results = await Anaheim_Ducks.check_ducks_away_score()
             if ducks_results != "The game hasn't finished yet!":
                 if ducks_results:
@@ -152,25 +151,6 @@ async def periodic_check():
 
             else:
                 ongoing_games = True  # Game is still ongoing, continue checking
-
-            '''
-            
-            This part is to check if the periodic check is working. Uncommenting this checks if the clippers 
-            opponents made a free throw in the 4th quarter regardless if the game is over or not. To use this, uncomment
-            this code to allow it to function.
-            
-            '''
-            # clippers_result = LA_Clippers.check_game_finish()
-            # clippers_4th_quarter = LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
-            # if clippers_4th_quarter:
-            #     # changed this so that it checks if the opponent made one basket or not
-            #     await channel.send(
-            #         "The opponents of the Los Angeles Clippers made 1 free throw at a home game! Free"
-            #         "Chick-fil-A sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to "
-            #         "claim your sandwich!"
-            #     )
-            #     LA_Clippers_game = False
-            #     ongoing_games = False
 
         if LA_Angels_game:
             angels_result = await LA_Angels.check_angels_score()

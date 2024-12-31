@@ -72,6 +72,7 @@ async def check_ducks_score(game_id):
         if data_nhl['plays'][-1]['typeDescKey'] == 'game-end':
             home_score = data_nhl['homeTeam']['score']
 
+            # if there is a shootout, check for home team goals
             if data_nhl['plays'][-1]['periodDescriptor']['periodType'] == 'SO':
                 so_score = 0
                 for plays in reversed(data_nhl['plays']):
@@ -81,10 +82,13 @@ async def check_ducks_score(game_id):
                     else:
                         break
 
+                # check if the ducks scored 5 goals in total regardless of regulation score
                 if home_score - 1 + so_score >= 5:
                     return True
                 else:
                     return False
+
+            # check if the ducks score 5 goals
             else:
                 if home_score >= 5:
                     return True
