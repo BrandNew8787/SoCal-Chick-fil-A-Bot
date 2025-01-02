@@ -85,10 +85,10 @@ async def periodic_check():
 
         async with state_lock:
             ongoing_games = False
-
             if LAFC_game:
                 lafc_results = await LAFC.get_match_results()
                 if lafc_results != "The game has not finished yet!":
+                    await channel.send("The LAFC Game has finished!")
                     if lafc_results['outcome'] == "Win":
                         now = datetime.datetime.now()
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
@@ -102,10 +102,9 @@ async def periodic_check():
                         await channel.send(
                             "LAFC did not win... no free sandwich today..."
                         )
-
-                    # Game is over, reset the state
-                    LAFC_game = False
-                    ongoing_games = False
+                        # Game is over, reset the state
+                        LAFC_game = False
+                        ongoing_games = False
 
                 else:
                     ongoing_games = True  # Game is still ongoing, continue checking
@@ -114,13 +113,12 @@ async def periodic_check():
                 # find the game ID for today
                 today_ducks_game = await Anaheim_Ducks.get_game_id()
                 ducks_results = await Anaheim_Ducks.check_ducks_score(today_ducks_game)
-
                 if ducks_results != "The game hasn't finished yet!":
+                    await channel.send("The Ducks Game has finished!")
                     if ducks_results:
                         now = datetime.datetime.now()
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
-                        # changed the message to state and away game had happened
                         await channel.send(
                             "@everyone The Anaheim Ducks have scored 5 or more goals at a home game! Free Chick-fil-A "
                             "sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your "
@@ -131,10 +129,9 @@ async def periodic_check():
                         await channel.send(
                             "The Anaheim Ducks did not score 5 points... no free sandwich today..."
                         )
-
-                    # Game is over, reset the state
-                    ANA_Ducks_game = False
-                    ongoing_games = False
+                        # Game is over, reset the state
+                        ANA_Ducks_game = False
+                        ongoing_games = False
 
                 else:
                     ongoing_games = True  # Game is still ongoing, continue checking
@@ -142,6 +139,7 @@ async def periodic_check():
             if LA_Clippers_game:
                 clippers_result = await LA_Clippers.check_game_finish()
                 if clippers_result == "W" or clippers_result == "L":
+                    await channel.send("The Clippers Game has finished!")
                     clippers_4th_quarter = LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
                     if clippers_4th_quarter:
                         now = datetime.datetime.now()
@@ -158,10 +156,9 @@ async def periodic_check():
                         await channel.send(
                             "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich today..."
                         )
-
-                    # Game is over, reset the state
-                    LA_Clippers_game = False
-                    ongoing_games = False
+                        # Game is over, reset the state
+                        LA_Clippers_game = False
+                        ongoing_games = False
 
                 else:
                     ongoing_games = True  # Game is still ongoing, continue checking
