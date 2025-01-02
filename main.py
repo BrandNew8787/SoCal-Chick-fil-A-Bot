@@ -99,10 +99,9 @@ async def periodic_check():
                         await channel.send(
                             "LAFC did not win... no free sandwich today..."
                         )
-
-                    # Game is over, reset the state
-                    LAFC_game = False
-                    ongoing_games = False
+                        # Game is over, reset the state
+                        LAFC_game = False
+                        ongoing_games = False
 
                 else:
                     ongoing_games = True  # Game is still ongoing, continue checking
@@ -117,7 +116,6 @@ async def periodic_check():
                         now = datetime.datetime.now()
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
-                        # changed the message to state and away game had happened
                         await channel.send(
                             "@everyone The Anaheim Ducks have scored 5 or more goals at a home game! Free Chick-fil-A "
                             "sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your "
@@ -128,10 +126,9 @@ async def periodic_check():
                         await channel.send(
                             "The Anaheim Ducks did not score 5 points... no free sandwich today..."
                         )
-
-                    # Game is over, reset the state
-                    ANA_Ducks_game = False
-                    ongoing_games = False
+                        # Game is over, reset the state
+                        ANA_Ducks_game = False
+                        ongoing_games = False
 
                 else:
                     ongoing_games = True  # Game is still ongoing, continue checking
@@ -156,10 +153,9 @@ async def periodic_check():
                         await channel.send(
                             "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich today..."
                         )
-
-                    # Game is over, reset the state
-                    LA_Clippers_game = False
-                    ongoing_games = False
+                        # Game is over, reset the state
+                        LA_Clippers_game = False
+                        ongoing_games = False
 
                 else:
                     ongoing_games = True  # Game is still ongoing, continue checking
@@ -181,7 +177,6 @@ async def periodic_check():
                         await channel.send(
                             "The Angels did not score 7 points... no free sandwich today..."
                         )
-
                         # Game is over, reset the state
                         LA_Angels_game = False
                         ongoing_games = False
