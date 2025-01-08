@@ -5,9 +5,11 @@ from datetime import datetime
 
 # # returns the date and opponent of the next scheduled lafc game
 def get_next_lafc_home_game():
+    year = datetime.now().year
     # URL of the page: eventually this website will need to be changed when the new schedule comes out
-    url = ("https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
-           "-League-Soccer")
+    url = (
+        f"https://fbref.com/en/squads/81d817a3/{year}/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
+        "-League-Soccer")
 
     # Send a GET request to the URL
     response = requests.get(url)
@@ -50,9 +52,11 @@ def get_next_lafc_home_game():
 
 # returns a boolean if there is a home game today
 def game_today():
-    # URL of the page
-    url = ("https://fbref.com/en/squads/81d817a3/2024/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
-           "-League-Soccer")
+    year = datetime.now().year
+    # URL of the page: eventually this website will need to be changed when the new schedule comes out
+    url = (
+        f"https://fbref.com/en/squads/81d817a3/{year}/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
+        "-League-Soccer")
 
     # Send a GET request to the URL
     response = requests.get(url)
