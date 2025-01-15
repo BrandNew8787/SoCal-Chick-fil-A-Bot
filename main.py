@@ -99,9 +99,9 @@ async def periodic_check():
                         await channel.send(
                             "LAFC did not win... no free sandwich today..."
                         )
-                        # Game is over, reset the state
-                        LAFC_game = False
-                        ongoing_games = False
+                    # Game is over, reset the state
+                    LAFC_game = False
+                    ongoing_games = False
 
                 else:
                     ongoing_games = True  # Game is still ongoing, continue checking
@@ -126,9 +126,9 @@ async def periodic_check():
                         await channel.send(
                             "The Anaheim Ducks did not score 5 points... no free sandwich today..."
                         )
-                        # Game is over, reset the state
-                        ANA_Ducks_game = False
-                        ongoing_games = False
+                    # Game is over, reset the state
+                    ANA_Ducks_game = False
+                    ongoing_games = False
 
                 else:
                     ongoing_games = True  # Game is still ongoing, continue checking
@@ -153,9 +153,9 @@ async def periodic_check():
                         await channel.send(
                             "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich today..."
                         )
-                        # Game is over, reset the state
-                        LA_Clippers_game = False
-                        ongoing_games = False
+                    # Game is over, reset the state
+                    LA_Clippers_game = False
+                    ongoing_games = False
 
                 else:
                     ongoing_games = True  # Game is still ongoing, continue checking
@@ -177,9 +177,9 @@ async def periodic_check():
                         await channel.send(
                             "The Angels did not score 7 points... no free sandwich today..."
                         )
-                        # Game is over, reset the state
-                        LA_Angels_game = False
-                        ongoing_games = False
+                    # Game is over, reset the state
+                    LA_Angels_game = False
+                    ongoing_games = False
                 else:
                     ongoing_games = True
         # If there are still ongoing games, wait for 10 minutes before checking again
