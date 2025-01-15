@@ -64,9 +64,11 @@ async def check_for_games():
             LA_Angels_game = False
 
         try:
+            print("Checking for clippers game today...")
             clippers_game_id = await LA_Clippers.get_game_id_today()  # Await the asynchronous function
             if clippers_game_id:
                 LA_Clippers_game = clippers_game_id is not None
+                print("We checked, and there is a clippers game today!")
             else:
                 LA_Clippers_game = False
         except Exception as e:
@@ -139,13 +141,16 @@ async def periodic_check():
 
             if LA_Clippers_game:
                 clippers_result = await LA_Clippers.check_game_finish()
+                print("There's a Clippers game today! Checking if the game is finished...")
                 if clippers_result == "W" or clippers_result == "L":
+                    print("The game has finished!")
                     await channel.send("The Clippers Game has finished!")
                     clippers_4th_quarter = LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
                     if clippers_4th_quarter:
                         now = datetime.datetime.now()
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
+                        print("Conditions were met! Free chic fil a!")
                         # changed this so that it checks if the opponent made one basket or not
                         await channel.send(
                             "@everyone The opponents of the Los Angeles Clippers missed 2 free throw at a home game! Free"
@@ -162,6 +167,7 @@ async def periodic_check():
                     ongoing_games = False
 
                 else:
+                    print("The game is not finished yet!")
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             '''

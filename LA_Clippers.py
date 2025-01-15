@@ -30,8 +30,10 @@ async def check_game_finish():
 
         if not clippers_home_game_today.empty:
             game_result = clippers_home_game_today.iloc[0]['WL']
+            print(game_result)
             return game_result
         else:
+            print("The game hasn't finished yet, or there is no game today")
             return None
 
     except Exception as e:
@@ -72,6 +74,8 @@ async def get_game_id_today():
 
     today = datetime.today().strftime("%m/%d/%Y")
     season = datetime.today().strftime("%Y")
+    if datetime.now().month < 6:
+        season = str(int(season) - 1)
 
     # this is a date where the opponent of the clippers missed 2 free throws
     # today = "11/18/2024"
@@ -239,7 +243,9 @@ def check_opponent_missed_two_ft_in_4th_quarter(game_id):
             if ('MISS' in description and 'Free Throw' in description
                     and ('2 of 2' in description or '2 of 3' in description or '3 of 3' in description)):
                 if team_abbreviation != 'LAC':
+                    print("The opponent team missed 2 free throws in the 4th quarter!")
                     return True
+    print("The opponent did not miss 2 free throws in the 4th quarter...")
     return False
 
 
