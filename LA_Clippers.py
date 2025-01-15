@@ -65,6 +65,11 @@ async def get_game_id_today():
 
     today = datetime.today().strftime("%m/%d/%Y")
     season = datetime.today().strftime("%Y")
+    if datetime.now().month < 6:
+        season = str(int(season) - 1)
+
+    # this is a date where the opponent of the clippers missed 2 free throws
+    # today = "11/18/2024"
 
     # URL to fetch the JSON data
     url = f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season}&RegionID=1&Date={today}&EST=Y"
