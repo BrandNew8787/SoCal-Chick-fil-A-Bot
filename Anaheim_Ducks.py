@@ -1,11 +1,13 @@
 from datetime import datetime
 import aiohttp  # For asynchronous HTTP requests
 
-today = datetime.today().strftime('%Y-%m-%d')
-NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
+# today = datetime.today().strftime('%Y-%m-%d')
+# NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
 
 
 async def get_game_id():
+    today = datetime.now().strftime('%Y-%m-%d')
+    NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
             data_nhl = await response.json()
@@ -37,6 +39,8 @@ async def get_ducks_next_home_game():
 
 # Checks if there is a ducks home game today
 async def ducks_home_game_today():
+    today = datetime.now().strftime('%Y-%m-%d')
+    NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
             data_nhl = await response.json()
@@ -51,6 +55,8 @@ async def ducks_home_game_today():
 
 # check if there is an away game today
 async def ducks_away_game_today():
+    today = datetime.now().strftime('%Y-%m-%d')
+    NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
             data_nhl = await response.json()
@@ -102,6 +108,8 @@ async def check_ducks_score(game_id):
 
 # For testing the ducks games, checks if the ducks scored 2 points at an away game
 async def check_ducks_away_score():
+    today = datetime.now().strftime('%Y-%m-%d')
+    NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
             data_nhl = await response.json()
@@ -110,9 +118,8 @@ async def check_ducks_away_score():
     daily_games = data_nhl['games']
     for i in daily_games:
         if i['awayTeam']['id'] == 24:
-            # THERE IS A TYPO WITH SCORE!!!! PLEASE FIX TMRW!
-            if 'score' in i['awayTeam'] and 'gameOutcome' in i:
-                if i['awayTeam']['score'] >= 2:
+            if 'scores' in i['awayTeam'] and 'gameOutcome' in i:
+                if i['awayTeam']['scores'] >= 2:
                     return True
                 else:
                     return False
