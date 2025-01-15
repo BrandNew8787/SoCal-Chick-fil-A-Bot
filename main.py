@@ -159,6 +159,7 @@ async def periodic_check():
                             delete_after=seconds_left
                         )
                     else:
+                        print("Conditions were not met, no free chick fil a today...")
                         await channel.send(
                             "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich today..."
                         )
