@@ -11,7 +11,7 @@ from nba_api.live.nba.endpoints import playbyplay
 # once the game is over, this function works!
 async def check_game_finish():
     # Get today's date in the correct format
-    today_date = datetime.today().strftime('%m/%d/%Y')
+    today_date = datetime.now().strftime('%m/%d/%Y')
 
     # this is a date where the opponent of the clippers missed 2 free throws
     # other_date = "11/18/2024"
@@ -44,7 +44,7 @@ async def check_game_finish():
 # This function can be used to check if there are any live games going on right now.
 def check_live_game():
     # Get today's date in the correct format
-    today_date = datetime.today().strftime('%m/%d/%Y')
+    today_date = datetime.now().strftime('%m/%d/%Y')
 
     try:
         # Simple test request to see if the API is reachable
@@ -72,8 +72,8 @@ async def get_game_id_today():
                       "Chrome/91.0.4472.124 Safari/537.36"
     }
 
-    today = datetime.today().strftime("%m/%d/%Y")
-    season = datetime.today().strftime("%Y")
+    today = datetime.now().strftime("%m/%d/%Y")
+    season = datetime.now().strftime("%Y")
     if datetime.now().month < 6:
         season = str(int(season) - 1)
 
@@ -97,7 +97,7 @@ async def get_game_id_today():
     game_format = "{gameID}: {awayTeam} vs. {homeTeam} @ {gameTime} ({broadcaster})"
 
     for game in future_games:
-        if game['htNickName'] == 'Clippers' and datetime.today().strftime("%m/%d/%Y") == game['date']:
+        if game['htNickName'] == 'Clippers' and datetime.now().strftime("%m/%d/%Y") == game['date']:
             print(
                 game_format.format(
                     gameID=game["gameID"],
