@@ -79,9 +79,10 @@ async def periodic_check():
 
     while not client.is_closed():
         await check_for_games()  # Refresh the state of game variables
+        ongoing_games = False
 
         async with state_lock:
-            ongoing_games = False
+
             if LAFC_game:
                 lafc_results = await LAFC.get_match_results()
                 if lafc_results != "The game has not finished yet!":
