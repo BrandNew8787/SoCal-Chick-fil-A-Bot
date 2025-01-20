@@ -1,11 +1,13 @@
 from datetime import datetime
+
+import aiohttp
 import requests
 from nba_api.stats.endpoints import leaguegamefinder
 from nba_api.live.nba.endpoints import playbyplay
 
 
 # use only if the game is finished
-async def check_game_finish():
+def check_game_finish():
     # Get today's date in the correct format
     today_date = datetime.now().strftime('%m/%d/%Y')
 
@@ -77,24 +79,27 @@ async def get_game_id_today():
     # URL to fetch the JSON data
     url = f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season}&RegionID=1&Date={today}&EST=Y"
 
-    response = requests.get(url, headers=headers)
-    data = response.json()
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(url, headers=headers, timeout=10) as response:
+                data = await response.json()
 
-    # Extract the upcoming games
-    future_games = data["resultSets"][0]["NextGameList"]
+                # Extract games
+                future_games = data["resultSets"][0].get("NextGameList", [])
+                ongoing_finished_games = data["resultSets"][1].get("CompleteGameList", [])
 
-    # Extract either live or finished games
-    ongoing_finished_games = data["resultSets"][1]["CompleteGameList"]
+                for game in future_games:
+                    if game.get('htNickName') == 'Clippers' and today == game.get('date'):
+                        return game["gameID"]
 
-    for game in future_games:
-        if game['htNickName'] == 'Clippers' and datetime.now().strftime("%m/%d/%Y") == game['date']:
-            return game["gameID"]
+                for game in ongoing_finished_games:
+                    if game.get('htNickName') == 'Clippers' and today == game.get('date'):
+                        return game["gameID"]
 
-    # Checks if there are any games playing live or if they are completed.
-    for game in ongoing_finished_games:
-        if game['htNickName'] == 'Clippers' and today == game['date']:
-            return game["gameID"]
-    return None
+                return None
+        except Exception as e:
+            print(f"Error fetching game ID: {e}")
+            return None
 
 
 # finds the next clippers home game parsing through a json file
