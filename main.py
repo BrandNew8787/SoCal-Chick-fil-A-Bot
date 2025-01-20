@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import os
+import logging
 from typing import Final
 
 from discord import Intents, Client, Message
@@ -12,6 +13,10 @@ import LA_Angels
 import LA_Clippers
 import webserver
 from responses import get_response
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 # STEP 0: LOAD OUR TOKEN FROM SOMEWHERE SAFE AND CREATE OUR GAME VARIABLES
 load_dotenv()
@@ -43,35 +48,35 @@ async def check_for_games():
 
     async with state_lock:
         try:
-            print("checking for lafc game")
+            logger.debug("Checking for LAFC game")
             LAFC_game = LAFC.game_today()
         except Exception as e:
-            print(f"Error checking LAFC game: {e}")
+            logger.error(f"Error checking LAFC game: {e}")
             LAFC_game = False
 
         try:
-            print("checking for ducks game")
+            logger.debug("Checking for Ducks game")
             ANA_Ducks_game = await Anaheim_Ducks.ducks_home_game_today()  # Await the asynchronous function
         except Exception as e:
-            print(f"Error checking Ducks game: {e}")
+            logger.error(f"Error checking Ducks game: {e}")
             ANA_Ducks_game = False
 
         try:
-            print("checking for angels game")
+            logger.debug("Checking for Angels game")
             LA_Angels_game = await LA_Angels.get_today_angels_home_game()  # Await the asynchronous function
         except Exception as e:
-            print(f"Error checking Angels game: {e}")
+            logger.error(f"Error checking Angels game: {e}")
             LA_Angels_game = False
 
         try:
-            print("checking for clippers game")
+            logger.debug("Checking for Clippers game")
             clippers_game_id = await LA_Clippers.get_game_id_today()  # Await the asynchronous function
             if clippers_game_id:
                 LA_Clippers_game = clippers_game_id is not None
             else:
                 LA_Clippers_game = False
         except Exception as e:
-            print(f"Error checking Clippers game: {e}")
+            logger.error(f"Error checking Clippers game: {e}")
             LA_Clippers_game = False
 
 
@@ -82,20 +87,20 @@ async def periodic_check():
     channel = client.get_channel(CHANNEL_ID)  # Get the channel to send messages
 
     while not client.is_closed():
-        print()
+        logger.info("Starting periodic check for games.")
         await check_for_games()  # Refresh the state of game variables
         ongoing_games = False
 
         async with state_lock:
 
             if LAFC_game:
-                print("there is an lafc game today!")
+                logger.info("there is an lafc game today!")
                 lafc_results = await LAFC.get_match_results()
                 if lafc_results != "The game has not finished yet!":
-                    print("The game has finished!")
+                    logger.info("The game has finished!")
                     await channel.send("The LAFC Game has finished!")
                     if lafc_results['outcome'] == "Win":
-                        print("Conditions are met for LAFC game.")
+                        logger.info("Conditions are met for LAFC game.")
                         now = datetime.datetime.now()
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
@@ -105,7 +110,7 @@ async def periodic_check():
                             delete_after=seconds_left
                         )
                     else:
-                        print("Conditions are met for LAFC games.")
+                        logger.info("Conditions are met for LAFC games.")
                         await channel.send(
                             "LAFC did not win... no free sandwich today..."
                         )
@@ -117,15 +122,15 @@ async def periodic_check():
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             if ANA_Ducks_game:
-                print("there is a ducks game today!")
+                logger.info("there is a ducks game today!")
                 # find the game ID for today
                 today_ducks_game = await Anaheim_Ducks.get_game_id()
                 ducks_results = await Anaheim_Ducks.check_ducks_score(today_ducks_game)
                 if ducks_results != "The game hasn't finished yet!":
-                    print("The game has finished!")
+                    logger.info("The game has finished!")
                     await channel.send("The Ducks Game has finished!")
                     if ducks_results:
-                        print("Conditions are met for Ducks games.")
+                        logger.info("Conditions are met for Ducks games.")
                         now = datetime.datetime.now()
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
@@ -136,7 +141,7 @@ async def periodic_check():
                             delete_after=seconds_left
                         )
                     else:
-                        print("Conditions are not met for Ducks game.")
+                        logger.info("Conditions are not met for Ducks game.")
                         await channel.send(
                             "The Anaheim Ducks did not score 5 points... no free sandwich today..."
                         )
@@ -148,14 +153,14 @@ async def periodic_check():
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             if LA_Clippers_game:
-                print("There is a clippers game today!")
+                logger.info("There is a clippers game today!")
                 clippers_result = await LA_Clippers.check_game_finish()
                 if clippers_result == "W" or clippers_result == "L":
-                    print("The clipper game has finished!")
+                    logger.info("The clipper game has finished!")
                     await channel.send("The Clippers Game has finished!")
                     clippers_4th_quarter = LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
                     if clippers_4th_quarter:
-                        print("Conditions are met for Clippers game.")
+                        logger.info("Conditions are met for Clippers game.")
                         now = datetime.datetime.now()
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
@@ -167,7 +172,7 @@ async def periodic_check():
                             delete_after=seconds_left
                         )
                     else:
-                        print("Conditions are not met for Angels game.")
+                        logger.info("Conditions are not met for Angels game.")
                         await channel.send(
                             "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich today..."
                         )
@@ -179,13 +184,13 @@ async def periodic_check():
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             if LA_Angels_game:
-                print("There is an Angels game today!")
+                logger.info("There is an Angels game today!")
                 angels_result = await LA_Angels.check_angels_score()
                 if angels_result != "The game has not finished yet!":
-                    print("The Angels game has finished!")
+                    logger.info("The Angels game has finished!")
                     await channel.send("The Angels Game has finished!")
                     if angels_result:
-                        print("Conditions are met for Angels game.")
+                        logger.info("Conditions are met for Angels game.")
                         now = datetime.datetime.now()
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
@@ -195,7 +200,7 @@ async def periodic_check():
                             delete_after=seconds_left
                         )
                     else:
-                        print("Conditions are not met for Angels game.")
+                        logger.info("Conditions are not met for Angels game.")
                         await channel.send(
                             "The Angels did not score 7 points... no free sandwich today..."
                         )
@@ -206,17 +211,17 @@ async def periodic_check():
                     ongoing_games = True
         # If there are still ongoing games, wait for 10 minutes before checking again
         if ongoing_games:
-            print("There is still an ongoing game today! This will check every 10 minutes")
+            logger.info("There is still an ongoing game today! This will check every 10 minutes")
             await asyncio.sleep(600)  # Wait for 10 minutes before checking again
         else:
-            print("There are no ongoing games today or the games have finished. Wait 6 hours for the next check.")
+            logger.info("There are no ongoing games today or the games have finished. Wait 6 hours for the next check.")
             await asyncio.sleep(21600)  # Wait for 6 hours before checking for new games
 
 
 # STEP 5: MESSAGE FUNCTIONALITY
 async def send_message(message: Message, user_message: str) -> None:
     if not user_message:
-        print('(Message was empty because intents were not enabled probably)')
+        logger.info('(Message was empty because intents were not enabled probably)')
         return
 
     if is_private := user_message[0] == '?':
@@ -229,13 +234,13 @@ async def send_message(message: Message, user_message: str) -> None:
         response: str = await get_response(user_message, bot_mention)
         await message.author.send(response) if is_private else await message.channel.send(response)
     except Exception as e:
-        print(e)
+        logger.info(e)
 
 
 # STEP 6: HANDLING THE STARTUP FOR OUR BOT
 @client.event
 async def on_ready() -> None:
-    print(f'{client.user} is now running!')
+    logger.info(f'{client.user} is now running!')
     await client.loop.create_task(periodic_check())  # Start the periodic check loop
 
 
@@ -252,7 +257,7 @@ async def on_message(message: Message) -> None:
     channel: str = str(message.channel)
 
     # Log the message
-    print(f'[{channel}] {username}: "{message.content}"')
+    logger.info(f'[{channel}] {username}: "{message.content}"')
 
     # Check if the bot is mentioned
     bot_mention = f'<@{client.user.id}>'
