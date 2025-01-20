@@ -83,7 +83,9 @@ async def periodic_check():
     channel = client.get_channel(CHANNEL_ID)  # Get the channel to send messages
 
     while not client.is_closed():
+        print()
         await check_for_games()  # Refresh the state of game variables
+        print(datetime.datetime.now())
         ongoing_games = False
 
         async with state_lock:
@@ -208,9 +210,9 @@ async def periodic_check():
                             "The Angels did not score 7 points... no free sandwich today..."
                         )
 
-                        # Game is over, reset the state
-                        LA_Angels_game = False
-                        ongoing_games = False
+                    # Game is over, reset the state
+                    LA_Angels_game = False
+                    ongoing_games = False
                 else:
                     ongoing_games = True
         # If there are still ongoing games, wait for 10 minutes before checking again
