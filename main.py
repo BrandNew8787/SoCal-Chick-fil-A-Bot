@@ -119,6 +119,7 @@ async def periodic_check():
                     ongoing_games = False
 
                 else:
+                    logger.info("The LAFC game hasn't finished yet.")
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             if ANA_Ducks_game:
@@ -150,6 +151,7 @@ async def periodic_check():
                     ongoing_games = False
 
                 else:
+                    logger.info("The Ducks game hasn't finished yet.")
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             if LA_Clippers_game:
@@ -181,6 +183,7 @@ async def periodic_check():
                     ongoing_games = False
 
                 else:
+                    logger.info("The Clippers game hasn't finished yet.")
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             if LA_Angels_game:
@@ -208,6 +211,7 @@ async def periodic_check():
                     LA_Angels_game = False
                     ongoing_games = False
                 else:
+                    logger.info("The Angels game hasn't finished yet.")
                     ongoing_games = True
         # If there are still ongoing games, wait for 10 minutes before checking again
         if ongoing_games:
