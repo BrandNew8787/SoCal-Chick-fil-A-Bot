@@ -74,6 +74,7 @@ async def check_for_games():
         try:
             logger.debug("Checking for Clippers game")
             clippers_game_id = LA_Clippers.get_game_id_today()  # Await the asynchronous function
+            logger.debug(clippers_game_id)
             if clippers_game_id:
                 LA_Clippers_game = clippers_game_id is not None
                 logger.debug(LA_Clippers_game)

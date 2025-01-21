@@ -1,6 +1,6 @@
 from datetime import datetime
 import aiohttp  # For asynchronous HTTP requests
-
+import logging
 # today = datetime.today().strftime('%Y-%m-%d')
 # NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
 
@@ -49,6 +49,9 @@ async def ducks_home_game_today():
     daily_games = data_nhl['games']
     for i in daily_games:
         if i['homeTeam']['id'] == 24:
+            logging.debug(i['homeTeam'])
+            logging.debug(i['awayTea'])
+            logging.debug(i['gameDate'])
             return True
     return False
 
