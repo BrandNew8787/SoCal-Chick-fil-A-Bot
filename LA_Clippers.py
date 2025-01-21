@@ -61,7 +61,7 @@ def check_live_game():
 
 
 # This is the new function that returns the id if there is a clippers home game today
-async def get_game_id_today():
+def get_game_id_today():
     # Fetch the JSON data from the API
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -79,27 +79,24 @@ async def get_game_id_today():
     # URL to fetch the JSON data
     url = f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season}&RegionID=1&Date={today}&EST=Y"
 
-    async with aiohttp.ClientSession() as session:
-        try:
-            async with session.get(url, headers=headers, timeout=10) as response:
-                data = await response.json()
+    response = requests.get(url, headers=headers)
+    data = response.json()
 
-                # Extract games
-                future_games = data["resultSets"][0].get("NextGameList", [])
-                ongoing_finished_games = data["resultSets"][1].get("CompleteGameList", [])
+    # Extract the upcoming games
+    future_games = data["resultSets"][0]["NextGameList"]
 
-                for game in future_games:
-                    if game.get('htNickName') == 'Clippers' and today == game.get('date'):
-                        return game["gameID"]
+    # Extract either live or finished games
+    ongoing_finished_games = data["resultSets"][1]["CompleteGameList"]
 
-                for game in ongoing_finished_games:
-                    if game.get('htNickName') == 'Clippers' and today == game.get('date'):
-                        return game["gameID"]
+    for game in future_games:
+        if game['htNickName'] == 'Clippers' and datetime.now().strftime("%m/%d/%Y") == game['date']:
+            return game["gameID"]
 
-                return None
-        except Exception as e:
-            print(f"Error fetching game ID: {e}")
-            return None
+    # Checks if there are any games playing live or if they are completed.
+    for game in ongoing_finished_games:
+        if game['htNickName'] == 'Clippers' and today == game['date']:
+            return game["gameID"]
+    return None
 
 
 # finds the next clippers home game parsing through a json file

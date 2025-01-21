@@ -49,7 +49,7 @@ async def check_for_games():
     async with state_lock:
         try:
             logger.debug("Checking for LAFC game")
-            LAFC_game = await LAFC.game_today()
+            LAFC_game = LAFC.game_today()
         except Exception as e:
             logger.error(f"Error checking LAFC game: {e}")
             LAFC_game = False
@@ -70,7 +70,7 @@ async def check_for_games():
 
         try:
             logger.debug("Checking for Clippers game")
-            clippers_game_id = await LA_Clippers.get_game_id_today()  # Await the asynchronous function
+            clippers_game_id = LA_Clippers.get_game_id_today()  # Await the asynchronous function
             if clippers_game_id:
                 LA_Clippers_game = clippers_game_id is not None
             else:

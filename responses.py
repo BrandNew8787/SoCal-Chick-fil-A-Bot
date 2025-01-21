@@ -51,7 +51,7 @@ async def get_response(user_input: str, bot_mention: str) -> str:
 
 async def next_chance():
     # Get upcoming game dates and opponents
-    lafc_date, lafc_opp = await LAFC.get_next_lafc_home_game()
+    lafc_date, lafc_opp = LAFC.get_next_lafc_home_game()
     duck_date, duck_opp_loc, duck_opp = await Anaheim_Ducks.get_ducks_next_home_game()  # Await here
     angels_date, angels_opp = LA_Angels.get_next_angels_game()
     clippers_date, clippers_opp = LA_Clippers.get_next_clippers_home_game()
