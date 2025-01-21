@@ -50,7 +50,7 @@ async def ducks_home_game_today():
     for i in daily_games:
         if i['homeTeam']['id'] == 24:
             logging.debug(i['homeTeam'])
-            logging.debug(i['awayTea'])
+            logging.debug(i['awayTeam'])
             logging.debug(i['gameDate'])
             return True
     return False
