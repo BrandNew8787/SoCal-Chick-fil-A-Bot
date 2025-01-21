@@ -6,3 +6,4 @@ discord~=2.3.2
 Flask~=3.0.3
 nba_api~=1.5.2
 python-dateutil~=2.9.0.post0
+pytz~=2023.2
