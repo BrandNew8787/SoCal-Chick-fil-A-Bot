@@ -7,7 +7,7 @@ import LAFC
 import LA_Angels
 import LA_Clippers
 
-pacific_tz = pytz.timezone("America/Los_Angels")
+pacific_tz = pytz.timezone("America/Los_Angeles")
 
 
 # returns phrases the bot will respond with given a command
