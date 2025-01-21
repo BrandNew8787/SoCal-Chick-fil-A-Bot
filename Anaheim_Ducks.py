@@ -4,6 +4,9 @@ import logging
 # today = datetime.today().strftime('%Y-%m-%d')
 # NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
 
+# Set up logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 async def get_game_id():
     today = datetime.now().strftime('%Y-%m-%d')
@@ -49,9 +52,9 @@ async def ducks_home_game_today():
     daily_games = data_nhl['games']
     for i in daily_games:
         if i['homeTeam']['id'] == 24:
-            logging.debug(i['homeTeam'])
-            logging.debug(i['awayTeam'])
-            logging.debug(i['gameDate'])
+            logger.debug(i['homeTeam'])
+            logger.debug(i['awayTeam'])
+            logger.debug(i['gameDate'])
             return True
     return False
 
