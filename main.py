@@ -50,6 +50,7 @@ async def check_for_games():
         try:
             logger.debug("Checking for LAFC game")
             LAFC_game = LAFC.game_today()
+            logger.debug(LAFC_game)
         except Exception as e:
             logger.error(f"Error checking LAFC game: {e}")
             LAFC_game = False
@@ -57,6 +58,7 @@ async def check_for_games():
         try:
             logger.debug("Checking for Ducks game")
             ANA_Ducks_game = await Anaheim_Ducks.ducks_home_game_today()  # Await the asynchronous function
+            logger.debug(ANA_Ducks_game)
         except Exception as e:
             logger.error(f"Error checking Ducks game: {e}")
             ANA_Ducks_game = False
@@ -64,6 +66,7 @@ async def check_for_games():
         try:
             logger.debug("Checking for Angels game")
             LA_Angels_game = await LA_Angels.get_today_angels_home_game()  # Await the asynchronous function
+            logger.debug(LA_Angels_game)
         except Exception as e:
             logger.error(f"Error checking Angels game: {e}")
             LA_Angels_game = False
@@ -73,6 +76,7 @@ async def check_for_games():
             clippers_game_id = LA_Clippers.get_game_id_today()  # Await the asynchronous function
             if clippers_game_id:
                 LA_Clippers_game = clippers_game_id is not None
+                logger.debug(LA_Clippers_game)
             else:
                 LA_Clippers_game = False
         except Exception as e:

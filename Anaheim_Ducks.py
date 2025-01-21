@@ -24,7 +24,7 @@ async def get_game_id():
 async def get_ducks_next_home_game():
     # Define the endpoint for the Ducks' schedule
     schedule_url = f"https://api-web.nhle.com/v1/club-schedule-season/ANA/now"
-    today_home = datetime.today().strftime('%Y-%m-%d')
+    today_home = datetime.now().strftime('%Y-%m-%d')
 
     async with aiohttp.ClientSession() as session:
         async with session.get(schedule_url) as response:
