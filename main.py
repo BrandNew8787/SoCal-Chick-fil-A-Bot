@@ -49,7 +49,7 @@ async def check_for_games():
     async with state_lock:
         try:
             logger.debug("Checking for LAFC game")
-            LAFC_game = LAFC.game_today()
+            LAFC_game = await LAFC.game_today()
         except Exception as e:
             logger.error(f"Error checking LAFC game: {e}")
             LAFC_game = False
@@ -156,7 +156,7 @@ async def periodic_check():
 
             if LA_Clippers_game:
                 logger.info("There is a clippers game today!")
-                clippers_result = await LA_Clippers.check_game_finish()
+                clippers_result = LA_Clippers.check_game_finish()
                 if clippers_result == "W" or clippers_result == "L":
                     logger.info("The clipper game has finished!")
                     await channel.send("The Clippers Game has finished!")
