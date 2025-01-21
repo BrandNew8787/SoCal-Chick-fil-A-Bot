@@ -1,10 +1,13 @@
 from datetime import datetime
+import pytz
 from random import randint
 
 import Anaheim_Ducks
 import LAFC
 import LA_Angels
 import LA_Clippers
+
+pacific_tz = pytz.timezone("America/Los_Angels")
 
 
 # returns phrases the bot will respond with given a command
@@ -57,7 +60,7 @@ async def next_chance():
     clippers_date, clippers_opp = LA_Clippers.get_next_clippers_home_game()
 
     # Convert dates to datetime objects for comparison
-    today = datetime.now()
+    today = datetime.now(pacific_tz)
 
     lafc_date = datetime.strptime(lafc_date, "%Y-%m-%d") if lafc_date != "No upcoming LAFC home games found." else None
     duck_date = datetime.strptime(duck_date, "%Y-%m-%d") if duck_date else None

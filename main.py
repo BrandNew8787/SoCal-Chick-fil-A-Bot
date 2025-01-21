@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import pytz
 import os
 import logging
 from typing import Final
@@ -13,6 +14,9 @@ import LA_Angels
 import LA_Clippers
 import webserver
 from responses import get_response
+
+# Define the timezone (Pacific Time Zone)
+pacific_tz = pytz.timezone("America/Los_Angeles")
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -106,7 +110,7 @@ async def periodic_check():
                     await channel.send("The LAFC Game has finished!")
                     if lafc_results['outcome'] == "Win":
                         logger.info("Conditions are met for LAFC game.")
-                        now = datetime.datetime.now()
+                        now = datetime.datetime.now(pacific_tz)
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
                         await channel.send(
@@ -137,7 +141,7 @@ async def periodic_check():
                     await channel.send("The Ducks Game has finished!")
                     if ducks_results:
                         logger.info("Conditions are met for Ducks games.")
-                        now = datetime.datetime.now()
+                        now = datetime.datetime.now(pacific_tz)
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
                         await channel.send(
@@ -168,7 +172,7 @@ async def periodic_check():
                     clippers_4th_quarter = LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
                     if clippers_4th_quarter:
                         logger.info("Conditions are met for Clippers game.")
-                        now = datetime.datetime.now()
+                        now = datetime.datetime.now(pacific_tz)
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
                         # changed this so that it checks if the opponent made one basket or not
@@ -199,7 +203,7 @@ async def periodic_check():
                     await channel.send("The Angels Game has finished!")
                     if angels_result:
                         logger.info("Conditions are met for Angels game.")
-                        now = datetime.datetime.now()
+                        now = datetime.datetime.now(pacific_tz)
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
                         await channel.send(

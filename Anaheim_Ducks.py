@@ -1,15 +1,19 @@
 from datetime import datetime
+import pytz
 import aiohttp  # For asynchronous HTTP requests
 import logging
 # today = datetime.today().strftime('%Y-%m-%d')
 # NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
+
+# Define the timezone (Pacific Time Zone)
+pacific_tz = pytz.timezone("America/Los_Angeles")
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 async def get_game_id():
-    today = datetime.now().strftime('%Y-%m-%d')
+    today = datetime.now(pacific_tz).strftime('%Y-%m-%d')
     NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
@@ -27,7 +31,7 @@ async def get_game_id():
 async def get_ducks_next_home_game():
     # Define the endpoint for the Ducks' schedule
     schedule_url = f"https://api-web.nhle.com/v1/club-schedule-season/ANA/now"
-    today_home = datetime.now().strftime('%Y-%m-%d')
+    today_home = datetime.now(pacific_tz).strftime('%Y-%m-%d')
 
     async with aiohttp.ClientSession() as session:
         async with session.get(schedule_url) as response:
@@ -42,7 +46,7 @@ async def get_ducks_next_home_game():
 
 # Checks if there is a ducks home game today
 async def ducks_home_game_today():
-    today = datetime.now().strftime('%Y-%m-%d')
+    today = datetime.now(pacific_tz).strftime('%Y-%m-%d')
     NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
@@ -61,7 +65,7 @@ async def ducks_home_game_today():
 
 # check if there is an away game today
 async def ducks_away_game_today():
-    today = datetime.now().strftime('%Y-%m-%d')
+    today = datetime.now(pacific_tz).strftime('%Y-%m-%d')
     NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:
@@ -114,7 +118,7 @@ async def check_ducks_score(game_id):
 
 # For testing the ducks games, checks if the ducks scored 2 points at an away game
 async def check_ducks_away_score():
-    today = datetime.now().strftime('%Y-%m-%d')
+    today = datetime.now(pacific_tz).strftime('%Y-%m-%d')
     NHL_API_URL: [str] = f"https://api-web.nhle.com/v1/score/{today}"
     async with aiohttp.ClientSession() as session:
         async with session.get(NHL_API_URL) as response:

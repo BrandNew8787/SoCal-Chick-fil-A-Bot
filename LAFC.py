@@ -1,11 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+import pytz
+
+# Define the timezone (Pacific Time Zone)
+pacific_tz = pytz.timezone("America/Los_Angeles")
 
 
 # # returns the date and opponent of the next scheduled lafc game
 def get_next_lafc_home_game():
-    year = datetime.now().year
+    year = datetime.now(pacific_tz).year
     # URL of the page: eventually this website will need to be changed when the new schedule comes out
     url = (
         f"https://fbref.com/en/squads/81d817a3/{year}/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
@@ -52,7 +56,7 @@ def get_next_lafc_home_game():
 
 # returns a boolean if there is a home game today
 def game_today():
-    year = datetime.now().year
+    year = datetime.now(pacific_tz).year
     # URL of the page: eventually this website will need to be changed when the new schedule comes out
     url = (
         f"https://fbref.com/en/squads/81d817a3/{year}/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
@@ -158,8 +162,8 @@ def get_match_results():
             date_str = row.find('div', class_='matchTeams').text.strip()
 
             # Parse the date string into a datetime object (current year)
-            match_date = datetime.strptime(date_str, '%a, %b %d').replace(year=datetime.now().year)
-            today = datetime.now()
+            match_date = datetime.strptime(date_str, '%a, %b %d').replace(year=datetime.now(pacific_tz).year)
+            today = datetime.now(pacific_tz)
 
             # Compare the match date with today's date
             if match_date.date() != today.date():

@@ -1,13 +1,15 @@
 from datetime import datetime, timedelta
+import pytz
 import aiohttp  # For asynchronous HTTP requests
 import requests
 
+pacific_tz = pytz.timezone("America/Los_Angeles")
 
 # returns the date and opponent of the next angels game
 def get_next_angels_game():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID
-    today = datetime.now()
+    today = datetime.now(pacific_tz)
     next_year = today + timedelta(days=365)
     url = (f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId={team_id}"
            f"&startDate={today.strftime('%Y-%m-%d')}&endDate={next_year.strftime('%Y-%m-%d')}")
@@ -40,7 +42,7 @@ def get_next_angels_game():
 async def get_today_angels_home_game():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID
-    today = datetime.now().strftime('%Y-%m-%d')
+    today = datetime.now(pacific_tz).strftime('%Y-%m-%d')
     url = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId={team_id}&startDate={today}&endDate={today}"
 
     async with aiohttp.ClientSession() as session:
@@ -64,7 +66,7 @@ async def get_today_angels_home_game():
 async def check_angels_score():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID
-    today = datetime.now().strftime('%Y-%m-%d')
+    today = datetime.now(pacific_tz).strftime('%Y-%m-%d')
     url = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId={team_id}&startDate={today}&endDate={today}"
 
     async with aiohttp.ClientSession() as session:
@@ -91,7 +93,7 @@ async def check_angels_score():
 async def get_game_id():
     # Set up the API URL with the necessary parameters
     team_id = 108  # Los Angeles Angels team ID
-    today = datetime.now().strftime('%Y-%m-%d')
+    today = datetime.now(pacific_tz).strftime('%Y-%m-%d')
     url = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId={team_id}&startDate={today}&endDate={today}"
 
     async with aiohttp.ClientSession() as session:

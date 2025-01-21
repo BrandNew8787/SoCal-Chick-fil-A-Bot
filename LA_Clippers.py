@@ -1,15 +1,17 @@
 from datetime import datetime
-
+import pytz
 import aiohttp
 import requests
 from nba_api.stats.endpoints import leaguegamefinder
 from nba_api.live.nba.endpoints import playbyplay
 
+pacific_tz = pytz.timezone("America/Los_Angeles")
+
 
 # use only if the game is finished
 def check_game_finish():
     # Get today's date in the correct format
-    today_date = datetime.now().strftime('%m/%d/%Y')
+    today_date = datetime.now(pacific_tz).strftime('%m/%d/%Y')
 
     # this is a date where the opponent of the clippers missed 2 free throws
     # other_date = "11/18/2024"
@@ -40,7 +42,7 @@ def check_game_finish():
 # This function can be used to check if there are any live games going on right now.
 def check_live_game():
     # Get today's date in the correct format
-    today_date = datetime.now().strftime('%m/%d/%Y')
+    today_date = datetime.now(pacific_tz).strftime('%m/%d/%Y')
 
     try:
         # Simple test request to see if the API is reachable
@@ -68,9 +70,9 @@ def get_game_id_today():
                       "Chrome/91.0.4472.124 Safari/537.36"
     }
 
-    today = datetime.now().strftime("%m/%d/%Y")
-    season = datetime.now().strftime("%Y")
-    if datetime.now().month < 6:
+    today = datetime.now(pacific_tz).strftime("%m/%d/%Y")
+    season = datetime.now(pacific_tz).strftime("%Y")
+    if datetime.now(pacific_tz).month < 6:
         season = str(int(season) - 1)
 
     # this is a date where the opponent of the clippers missed 2 free throws
@@ -89,7 +91,7 @@ def get_game_id_today():
     ongoing_finished_games = data["resultSets"][1]["CompleteGameList"]
 
     for game in future_games:
-        if game['htNickName'] == 'Clippers' and datetime.now().strftime("%m/%d/%Y") == game['date']:
+        if game['htNickName'] == 'Clippers' and datetime.now(pacific_tz).strftime("%m/%d/%Y") == game['date']:
             return game["gameID"]
 
     # Checks if there are any games playing live or if they are completed.
@@ -125,7 +127,7 @@ def get_next_clippers_home_game():
 
             for game in game_date['games']:
                 if (game['homeTeam']['teamName'] == "Clippers"
-                        and game_date_only >= datetime.now().date()):
+                        and game_date_only >= datetime.now(pacific_tz).date()):
                     home_team = game['homeTeam']['teamName']
                     away_team = game['awayTeam']['teamCity'] + " " + game['awayTeam']['teamName']
                     formatted_date = datetime.strptime(original_date, '%m/%d/%Y %H:%M:%S').strftime('%Y-%m-%d')
