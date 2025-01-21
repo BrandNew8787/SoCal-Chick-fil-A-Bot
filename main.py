@@ -77,7 +77,7 @@ async def check_for_games():
 
         try:
             logger.debug("Checking for Clippers game")
-            clippers_game_id = LA_Clippers.get_game_id_today()  # Await the asynchronous function
+            clippers_game_id = await LA_Clippers.get_game_id_today()  # Await the asynchronous function
             logger.debug(clippers_game_id)
             if clippers_game_id:
                 LA_Clippers_game = clippers_game_id is not None
@@ -165,11 +165,11 @@ async def periodic_check():
 
             if LA_Clippers_game:
                 logger.info("There is a clippers game today!")
-                clippers_result = LA_Clippers.check_game_finish()
+                clippers_result = await LA_Clippers.check_game_finish()
                 if clippers_result == "W" or clippers_result == "L":
                     logger.info("The clipper game has finished!")
                     await channel.send("The Clippers Game has finished!")
-                    clippers_4th_quarter = LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
+                    clippers_4th_quarter = await LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
                     if clippers_4th_quarter:
                         logger.info("Conditions are met for Clippers game.")
                         now = datetime.datetime.now(pacific_tz)
@@ -183,7 +183,7 @@ async def periodic_check():
                             delete_after=seconds_left
                         )
                     else:
-                        logger.info("Conditions are not met for Angels game.")
+                        logger.info("Conditions are not met for clippers game.")
                         await channel.send(
                             "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich today..."
                         )

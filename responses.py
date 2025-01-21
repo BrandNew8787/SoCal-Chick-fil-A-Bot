@@ -29,7 +29,7 @@ async def get_response(user_input: str, bot_mention: str) -> str:
         next_game = await next_chance()
         return next_game
     elif 'next clippers game' in lowered:
-        clippers_date, clippers_opp = LA_Clippers.get_next_clippers_home_game()
+        clippers_date, clippers_opp = await LA_Clippers.get_next_clippers_home_game()
         clippers_date = datetime.strptime(clippers_date, "%Y-%m-%d") if clippers_date else None
         return (f"The next Clippers Home Game:\n\tGAME: Los Angeles Clippers vs. {clippers_opp}"
                 f"\n\tDATE: {clippers_date.strftime('%b %d, %Y')}")
@@ -57,7 +57,7 @@ async def next_chance():
     lafc_date, lafc_opp = LAFC.get_next_lafc_home_game()
     duck_date, duck_opp_loc, duck_opp = await Anaheim_Ducks.get_ducks_next_home_game()  # Await here
     angels_date, angels_opp = LA_Angels.get_next_angels_game()
-    clippers_date, clippers_opp = LA_Clippers.get_next_clippers_home_game()
+    clippers_date, clippers_opp = await LA_Clippers.get_next_clippers_home_game()
 
     # Convert dates to datetime objects for comparison
     today = datetime.now(pacific_tz)
