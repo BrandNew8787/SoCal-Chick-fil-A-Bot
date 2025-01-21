@@ -123,7 +123,7 @@ async def periodic_check():
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             if ANA_Ducks_game:
-                logger.info("there is a ducks game today!")
+                logger.info("There is a ducks game today!")
                 # find the game ID for today
                 today_ducks_game = await Anaheim_Ducks.get_game_id()
                 ducks_results = await Anaheim_Ducks.check_ducks_score(today_ducks_game)
