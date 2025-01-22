@@ -35,7 +35,7 @@ ANA_Ducks_game = False
 LA_Angels_game = False
 clippers_game_id = None
 clippers_result = None
-current_date = datetime.datetime.now(pacific_tz).date()
+current_date = datetime.datetime.now(pacific_tz).date() - datetime.timedelta(days=1)
 
 # Lock for shared state
 state_lock = asyncio.Lock()

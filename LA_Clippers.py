@@ -262,7 +262,3 @@ async def check_missed_ft_in_4th_quarter_v2(game_id):
         except Exception as e:
             print(f"Error occurred: {e}")
             return None
-
-
-# Run the asynchronous function using an event loop
-print(datetime.now(pacific_tz).date())
