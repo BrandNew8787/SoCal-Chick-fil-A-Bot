@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %
 logger = logging.getLogger(__name__)
 
 pacific_tz = pytz.timezone("America/Los_Angeles")
-# https://stats.nba.com/stats/leaguegamefinder?Conference=&DateFrom=11%2F18%2F2024&DateTo=11%2F18%2F2024&Division=&DraftNumber=&DraftRound=&DraftTeamID=&DraftYear=&EqAST=&EqBLK=&EqDD=&EqDREB=&EqFG3A=&EqFG3M=&EqFG3_PCT=&EqFGA=&EqFGM=&EqFG_PCT=&EqFTA=&EqFTM=&EqFT_PCT=&EqMINUTES=&EqOREB=&EqPF=&EqPTS=&EqREB=&EqSTL=&EqTD=&EqTOV=&GameID=&GtAST=&GtBLK=&GtDD=&GtDREB=&GtFG3A=&GtFG3M=&GtFG3_PCT=&GtFGA=&GtFGM=&GtFG_PCT=&GtFTA=&GtFTM=&GtFT_PCT=&GtMINUTES=&GtOREB=&GtPF=&GtPTS=&GtREB=&GtSTL=&GtTD=&GtTOV=&LeagueID=&Location=&LtAST=&LtBLK=&LtDD=&LtDREB=&LtFG3A=&LtFG3M=&LtFG3_PCT=&LtFGA=&LtFGM=&LtFG_PCT=&LtFTA=&LtFTM=&LtFT_PCT=&LtMINUTES=&LtOREB=&LtPF=&LtPTS=&LtREB=&LtSTL=&LtTD=&LtTOV=&Outcome=&PORound=&PlayerID=&PlayerOrTeam=T&RookieYear=&Season=&SeasonSegment=&SeasonType=&StarterBench=&TeamID=1610612746&VsConference=&VsDivision=&VsTeamID=&YearsExperience=
+other_date = "11/18/2024"
 
 
 async def fetch_game_data(date):
@@ -91,7 +91,7 @@ async def get_game_id_today():
 
     # URL to fetch the JSON data
     url = (f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season}"
-           f"&RegionID=1&Date={today}&EST=Y")
+           f"&RegionID=1&Date={other_date}&EST=Y")
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
@@ -104,14 +104,50 @@ async def get_game_id_today():
     ongoing_finished_games = data["resultSets"][1]["CompleteGameList"]
 
     for game in future_games:
-        if game['htNickName'] == 'Clippers' and datetime.now(pacific_tz).strftime("%m/%d/%Y") == game['date']:
+        if game['htNickName'] == 'Clippers' and other_date == game['date']:
             return game["gameID"]
 
     # Checks if there are any games playing live or if they are completed.
     for game in ongoing_finished_games:
-        if game['htNickName'] == 'Clippers' and today == game['date']:
+        if game['htNickName'] == 'Clippers' and other_date == game['date']:
             return game["gameID"]
     return None
+
+
+async def check_game_finish_v2(game_id):
+    # Fetch the JSON data from the API
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/91.0.4472.124 Safari/537.36"
+    }
+
+    # URL to fetch the JSON data
+    url = f"https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_{game_id}.json"
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    try:
+                        data = await response.json()
+                    except aiohttp.ContentTypeError:
+                        logger.debug("Response is not JSON. Access might be denied.")
+                        return None
+
+                    # Extract the play by plays
+                    play_by_plays = data["game"]["actions"]
+
+                    # Find the last element to determine if the game has ended
+                    if play_by_plays[-1]["description"] == 'Game End':
+                        return True
+                    else:
+                        return False
+                else:
+                    logger.debug("The page was not available, the game hasn't finished yet!")
+                    return False
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            return None
 
 
 # finds the next clippers home game parsing through a json file
@@ -141,7 +177,6 @@ def get_next_clippers_home_game():
             for game in game_date['games']:
                 if (game['homeTeam']['teamName'] == "Clippers"
                         and game_date_only >= datetime.now().date()):
-                    home_team = game['homeTeam']['teamName']
                     away_team = game['awayTeam']['teamCity'] + " " + game['awayTeam']['teamName']
                     formatted_date = datetime.strptime(original_date, '%m/%d/%Y %H:%M:%S').strftime('%Y-%m-%d')
                     return formatted_date, away_team
@@ -163,29 +198,82 @@ async def fetch_play_by_play_data(game_id):
 
 # This function displays the current games that are going on right now with live updates.
 # It will send a message if the opponents of the opponents missed 2 free throws in a row in the 4th quarter.
-async def check_opponent_missed_two_ft_in_4th_quarter(game_id):
-    for attempt in range(3):
-        try:
-            events = await fetch_play_by_play_data(game_id)
-            if events is None:
-                continue
-            for event in reversed(events):
-                period = event.get('period', 0)
-                description = event.get('description', '')
-                team_abbreviation = event.get('teamTricode', '')
+# THIS FUNCTION IS USES THE BUILT-IN API FOR PYTHON
+def check_opponent_missed_two_ft_in_4th_quarter(game_id):
+    pbp = playbyplay.PlayByPlay(game_id=game_id).get_dict()
+    events = pbp['game']['actions']
 
-                # We are only interested in the 4th quarter (period 4)
-                if period == 4:
-                    # Check for missed free throw events by the opponent
-                    if ('MISS' in description and 'Free Throw' in description
-                            and ('2 of 2' in description or '2 of 3' in description or '3 of 3' in description)):
-                        if team_abbreviation != 'LAC':
-                            return True
-                else:
-                    break
-            return False
+    for event in events:
+        period = event.get('period', 0)
+        description = event.get('description', '')
+        team_abbreviation = event.get('teamTricode', '')
+
+        # We are only interested in the 4th quarter (period 4)
+        if period == 4:
+            # Check for missed free throw events by the opponent
+            if ('MISS' in description and 'Free Throw' in description
+                    and ('2 of 2' in description or '2 of 3' in description or '3 of 3' in description)):
+                if team_abbreviation != 'LAC':
+                    print("The opponent team missed 2 free throws in the 4th quarter!")
+                    return True
+    print("The opponent did not miss 2 free throws in the 4th quarter...")
+    return False
+
+
+# This function displays the current games that are going on right now with live updates.
+# It will send a message if the opponents of the opponents missed 2 free throws in a row in the 4th quarter.
+# THIS USES A URL TO GET THE CURRENT PLAY BY PLAYS
+async def check_opponent_missed_two_ft_in_4th_quarter_v2(game_id):
+    # Fetch the JSON data from the API
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/91.0.4472.124 Safari/537.36"
+    }
+
+    # URL to fetch the JSON data
+    url = f"https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_{game_id}.json"
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    try:
+                        data = await response.json()
+                    except aiohttp.ContentTypeError:
+                        logger.debug("Response is not JSON. Access might be denied.")
+                        return None
+
+                    # Extract the play by plays
+                    events = data["game"]["actions"]
+
+                    for event in reversed(events):
+                        period = event.get('period', 0)
+                        description = event.get('description', '')
+                        team_abbreviation = event.get('teamTricode', '')
+
+                        # We are only interested in the 4th quarter (period 4)
+                        if period == 4:
+                            # Check for missed free throw events by the opponent
+                            if ('MISS' in description and 'Free Throw' in description
+                                    and ('2 of 2' in description or '2 of 3' in description
+                                         or '3 of 3' in description)):
+                                if team_abbreviation != 'LAC':
+                                    return True
+                    return False
         except Exception as e:
-            logger.debug(f"Attempt {attempt + 1} failed: {e}. Retrying...")
-            await asyncio.sleep(2)  # Retry delay
-    logger.error("All attempts to fetch game data failed.")
-    return None
+            print(f"Error occurred: {e}")
+            return None
+
+
+# Run the asynchronous function using an event loop
+async def main():
+    print(get_next_clippers_home_game())
+    game_id = await get_game_id_today()
+    game_play = await check_game_finish_v2(game_id)
+    print(game_play)
+    print(await check_opponent_missed_two_ft_in_4th_quarter(game_id))
+
+
+# Run the async function
+if __name__ == "__main__":
+    asyncio.run(main())

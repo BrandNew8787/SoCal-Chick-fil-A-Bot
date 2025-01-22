@@ -165,11 +165,11 @@ async def periodic_check():
 
             if LA_Clippers_game:
                 logger.info("There is a clippers game today!")
-                clippers_result = await LA_Clippers.check_game_finish()
-                if clippers_result == "W" or clippers_result == "L":
+                clippers_result = await LA_Clippers.check_game_finish_v2(clippers_game_id)
+                if clippers_result:
                     logger.info("The clipper game has finished!")
                     await channel.send("The Clippers Game has finished!")
-                    clippers_4th_quarter = await LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter(clippers_game_id)
+                    clippers_4th_quarter = await LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter_v2(clippers_game_id)
                     if clippers_4th_quarter:
                         logger.info("Conditions are met for Clippers game.")
                         now = datetime.datetime.now(pacific_tz)
