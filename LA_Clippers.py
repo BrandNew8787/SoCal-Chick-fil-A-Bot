@@ -13,7 +13,6 @@ logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %
 logger = logging.getLogger(__name__)
 
 pacific_tz = pytz.timezone("America/Los_Angeles")
-other_date = "11/18/2024"
 
 
 async def fetch_game_data(date):
@@ -91,7 +90,7 @@ async def get_game_id_today():
 
     # URL to fetch the JSON data
     url = (f"https://stats.nba.com/stats/internationalbroadcasterschedule?LeagueID=00&Season={season}"
-           f"&RegionID=1&Date={other_date}&EST=Y")
+           f"&RegionID=1&Date={today}&EST=Y")
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
@@ -104,12 +103,12 @@ async def get_game_id_today():
     ongoing_finished_games = data["resultSets"][1]["CompleteGameList"]
 
     for game in future_games:
-        if game['htNickName'] == 'Clippers' and other_date == game['date']:
+        if game['htNickName'] == 'Clippers' and today == game['date']:
             return game["gameID"]
 
     # Checks if there are any games playing live or if they are completed.
     for game in ongoing_finished_games:
-        if game['htNickName'] == 'Clippers' and other_date == game['date']:
+        if game['htNickName'] == 'Clippers' and today == game['date']:
             return game["gameID"]
     return None
 
