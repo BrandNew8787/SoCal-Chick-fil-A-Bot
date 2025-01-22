@@ -222,7 +222,7 @@ def check_opponent_missed_two_ft_in_4th_quarter(game_id):
 # This function displays the current games that are going on right now with live updates.
 # It will send a message if the opponents of the opponents missed 2 free throws in a row in the 4th quarter.
 # THIS USES A URL TO GET THE CURRENT PLAY BY PLAYS
-async def check_opponent_missed_two_ft_in_4th_quarter_v2(game_id):
+async def check_missed_ft_in_4th_quarter_v2(game_id):
     # Fetch the JSON data from the API
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -265,14 +265,4 @@ async def check_opponent_missed_two_ft_in_4th_quarter_v2(game_id):
 
 
 # Run the asynchronous function using an event loop
-async def main():
-    print(get_next_clippers_home_game())
-    game_id = await get_game_id_today()
-    game_play = await check_game_finish_v2(game_id)
-    print(game_play)
-    print(await check_opponent_missed_two_ft_in_4th_quarter(game_id))
-
-
-# Run the async function
-if __name__ == "__main__":
-    asyncio.run(main())
+print(datetime.now(pacific_tz).date())

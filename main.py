@@ -35,6 +35,7 @@ ANA_Ducks_game = False
 LA_Angels_game = False
 clippers_game_id = None
 clippers_result = None
+current_date = datetime.datetime.now(pacific_tz).date()
 
 # Lock for shared state
 state_lock = asyncio.Lock()
@@ -91,7 +92,7 @@ async def check_for_games():
 
 # STEP 4: PERIODIC CHECK FUNCTION
 async def periodic_check():
-    global LAFC_game, ANA_Ducks_game, LA_Angels_game, LA_Clippers_game, clippers_game_id, clippers_result
+    global LAFC_game, ANA_Ducks_game, LA_Angels_game, LA_Clippers_game, clippers_game_id, clippers_result, current_date
     await client.wait_until_ready()  # Wait until the bot is ready
     channel = client.get_channel(CHANNEL_ID)  # Get the channel to send messages
 
@@ -101,18 +102,22 @@ async def periodic_check():
         ongoing_games = False
 
         async with state_lock:
-
+            now = datetime.datetime.now(pacific_tz)
+            tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
+            seconds_left = (tomorrow - now).seconds
+            today_date = now.date()
             if LAFC_game:
+                if today_date > current_date:
+                    current_date = today_date
+                    await channel.send("LAFC has a home game today! Be on the lookout for a free sandwich "
+                                       ":chicken::sandwich:", delete_after=seconds_left)
                 logger.info("there is an lafc game today!")
                 lafc_results = await LAFC.get_match_results()
                 if lafc_results != "The game has not finished yet!":
                     logger.info("The game has finished!")
-                    await channel.send("The LAFC Game has finished!")
+                    await channel.send("The LAFC Game has finished!", delete_after=seconds_left)
                     if lafc_results['outcome'] == "Win":
                         logger.info("Conditions are met for LAFC game.")
-                        now = datetime.datetime.now(pacific_tz)
-                        tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
-                        seconds_left = (tomorrow - now).seconds
                         await channel.send(
                             "@everyone LAFC has won their home game! Free Chick-fil-A sandwich! Open "
                             "[here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
@@ -132,13 +137,17 @@ async def periodic_check():
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             if ANA_Ducks_game:
+                if today_date > current_date:
+                    current_date = today_date
+                    await channel.send("The Anaheim Ducks has a home game today! Be on the lookout for a free sandwich "
+                                       ":chicken::sandwich:", delete_after=seconds_left)
                 logger.info("There is a ducks game today!")
                 # find the game ID for today
                 today_ducks_game = await Anaheim_Ducks.get_game_id()
                 ducks_results = await Anaheim_Ducks.check_ducks_score(today_ducks_game)
                 if ducks_results != "The game hasn't finished yet!":
                     logger.info("The game has finished!")
-                    await channel.send("The Ducks Game has finished!")
+                    await channel.send("The Ducks Game has finished!", delete_after=seconds_left)
                     if ducks_results:
                         logger.info("Conditions are met for Ducks games.")
                         now = datetime.datetime.now(pacific_tz)
@@ -146,7 +155,7 @@ async def periodic_check():
                         seconds_left = (tomorrow - now).seconds
                         await channel.send(
                             "@everyone The Anaheim Ducks have scored 5 or more goals at a home game! Free Chick-fil-A "
-                            "sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your "
+                            "sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your"
                             "sandwich!",
                             delete_after=seconds_left
                         )
@@ -164,12 +173,16 @@ async def periodic_check():
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             if LA_Clippers_game:
+                if today_date > current_date:
+                    current_date = today_date
+                    await channel.send("The LA Clippers has a home game today! Be on the lookout for a free sandwich "
+                                       ":chicken::sandwich:", delete_after=seconds_left)
                 logger.info("There is a clippers game today!")
                 clippers_result = await LA_Clippers.check_game_finish_v2(clippers_game_id)
                 if clippers_result:
                     logger.info("The clipper game has finished!")
-                    await channel.send("The Clippers Game has finished!")
-                    clippers_4th_quarter = await LA_Clippers.check_opponent_missed_two_ft_in_4th_quarter_v2(clippers_game_id)
+                    await channel.send("The Clippers Game has finished!", delete_after=seconds_left)
+                    clippers_4th_quarter = await LA_Clippers.check_missed_ft_in_4th_quarter_v2(clippers_game_id)
                     if clippers_4th_quarter:
                         logger.info("Conditions are met for Clippers game.")
                         now = datetime.datetime.now(pacific_tz)
@@ -177,15 +190,16 @@ async def periodic_check():
                         seconds_left = (tomorrow - now).seconds
                         # changed this so that it checks if the opponent made one basket or not
                         await channel.send(
-                            "@everyone The opponents of the Los Angeles Clippers missed 2 free throw at a home game! Free"
-                            "Chick-fil-A sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to "
-                            "claim your sandwich!",
+                            "@everyone The opponents of the Los Angeles Clippers missed 2 free throw at a home game! "
+                            "Free Chick-fil-A sandwich! Open [here]("
+                            "https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
                             delete_after=seconds_left
                         )
                     else:
                         logger.info("Conditions are not met for clippers game.")
                         await channel.send(
-                            "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich today..."
+                            "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich "
+                            "today..."
                         )
                     # Game is over, reset the state
                     LA_Clippers_game = False
@@ -196,19 +210,23 @@ async def periodic_check():
                     ongoing_games = True  # Game is still ongoing, continue checking
 
             if LA_Angels_game:
+                if today_date > current_date:
+                    current_date = today_date
+                    await channel.send("The Los Angeles Clippers has a home game today! Be on the lookout for a free "
+                                       "sandwich :chicken::sandwich:", delete_after=seconds_left)
                 logger.info("There is an Angels game today!")
                 angels_result = await LA_Angels.check_angels_score()
                 if angels_result != "The game has not finished yet!":
                     logger.info("The Angels game has finished!")
-                    await channel.send("The Angels Game has finished!")
+                    await channel.send("The Angels Game has finished!", delete_after=seconds_left)
                     if angels_result:
                         logger.info("Conditions are met for Angels game.")
                         now = datetime.datetime.now(pacific_tz)
                         tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
                         seconds_left = (tomorrow - now).seconds
                         await channel.send(
-                            "@everyone The Los Angeles Angels have scored 7 points! Free Chick-fil-A sandwich!"
-                            " Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
+                            "@everyone The Los Angeles Angels have scored 7 points! Free Chick-fil-A sandwich! Open ["
+                            "here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
                             delete_after=seconds_left
                         )
                     else:
