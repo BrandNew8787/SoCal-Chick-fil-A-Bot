@@ -36,7 +36,7 @@ async def check_game_finish():
     today_date = datetime.now(pacific_tz).strftime('%m/%d/%Y')
     for attempt in range(3):
         try:
-            games = await fetch_game_data(today_date)
+            games = await asyncio.to_thread(fetch_game_data, today_date)
             if games is None:
                 continue
             # Filter the games to find a home game
@@ -48,7 +48,7 @@ async def check_game_finish():
                 return None
         except Exception as e:
             logger.debug(f"Attempt {attempt + 1} failed: {e}. Retrying...")
-            await asyncio.sleep(2)  # Retry delay
+            await asyncio.sleep(2 * attempt)  # Retry delay
     logger.error("All attempts to fetch game data failed.")
     return None
 
@@ -115,36 +115,39 @@ async def get_game_id_today():
 
 
 # finds the next clippers home game parsing through a json file
-async def get_next_clippers_home_game():
+def get_next_clippers_home_game():
     # URL for the NBA schedule JSON data
     url = "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json"
 
-    async with aiohttp.ClientSession() as session:
-        try:
-            async with session.get(url) as response:
-                data = await response.json()
+    try:
+        # Fetch the JSON data
+        response = requests.get(url)
+        response.raise_for_status()  # Ensure the request was successful
 
-            # Example: Extracting all games
-            games = data['leagueSchedule']['gameDates']
+        # Parse the JSON content
+        data = response.json()
 
-            for game_date in games:
-                # Parse and reformat the date
-                original_date = game_date.get('gameDate')  # e.g., '10/05/2024 00:00:00'
-                game_datetime = datetime.strptime(original_date, '%m/%d/%Y %H:%M:%S')  # Convert to datetime object
+        # Example: Extracting all games
+        games = data['leagueSchedule']['gameDates']
 
-                # Get the date part only
-                game_date_only = game_datetime.date()
+        for game_date in games:
+            # Parse and reformat the date
+            original_date = game_date.get('gameDate')  # e.g., '10/05/2024 00:00:00'
+            game_datetime = datetime.strptime(original_date, '%m/%d/%Y %H:%M:%S')  # Convert to datetime object
 
-                for game in game_date['games']:
-                    if (game['homeTeam']['teamName'] == "Clippers"
-                            and game_date_only >= datetime.now(pacific_tz).date()):
-                        home_team = game['homeTeam']['teamName']
-                        away_team = game['awayTeam']['teamCity'] + " " + game['awayTeam']['teamName']
-                        formatted_date = datetime.strptime(original_date, '%m/%d/%Y %H:%M:%S').strftime('%Y-%m-%d')
-                        return formatted_date, away_team
+            # Get the date part only
+            game_date_only = game_datetime.date()
 
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching data: {e}")
+            for game in game_date['games']:
+                if (game['homeTeam']['teamName'] == "Clippers"
+                        and game_date_only >= datetime.now().date()):
+                    home_team = game['homeTeam']['teamName']
+                    away_team = game['awayTeam']['teamCity'] + " " + game['awayTeam']['teamName']
+                    formatted_date = datetime.strptime(original_date, '%m/%d/%Y %H:%M:%S').strftime('%Y-%m-%d')
+                    return formatted_date, away_team
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
 
 
 async def fetch_play_by_play_data(game_id):
