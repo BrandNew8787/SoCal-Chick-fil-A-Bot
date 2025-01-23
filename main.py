@@ -102,9 +102,12 @@ async def periodic_check():
         ongoing_games = False
 
         async with state_lock:
+            # calculate the amount of time left before the day ends
             now = datetime.datetime.now(pacific_tz)
             tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
             seconds_left = (tomorrow - now).seconds
+
+            # retrieve today's date to compare to current date
             today_date = now.date()
             date_change = False
             if LAFC_game:
@@ -131,7 +134,6 @@ async def periodic_check():
                         )
                     # Game is over, reset the state
                     LAFC_game = False
-                    ongoing_games = False
 
                 else:
                     logger.info("The LAFC game hasn't finished yet.")
@@ -151,9 +153,6 @@ async def periodic_check():
                     await channel.send("The Ducks Game has finished!", delete_after=seconds_left)
                     if ducks_results:
                         logger.info("Conditions are met for Ducks games.")
-                        now = datetime.datetime.now(pacific_tz)
-                        tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
-                        seconds_left = (tomorrow - now).seconds
                         await channel.send(
                             "@everyone The Anaheim Ducks have scored 5 or more goals at a home game! Free Chick-fil-A "
                             "sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your"
@@ -167,7 +166,6 @@ async def periodic_check():
                         )
                     # Game is over, reset the state
                     ANA_Ducks_game = False
-                    ongoing_games = False
 
                 else:
                     logger.info("The Ducks game hasn't finished yet.")
@@ -186,9 +184,6 @@ async def periodic_check():
                     clippers_4th_quarter = await LA_Clippers.check_missed_ft_in_4th_quarter_v2(clippers_game_id)
                     if clippers_4th_quarter:
                         logger.info("Conditions are met for Clippers game.")
-                        now = datetime.datetime.now(pacific_tz)
-                        tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
-                        seconds_left = (tomorrow - now).seconds
                         # changed this so that it checks if the opponent made one basket or not
                         await channel.send(
                             "@everyone The opponents of the Los Angeles Clippers missed 2 free throw at a home game! "
@@ -204,7 +199,6 @@ async def periodic_check():
                         )
                     # Game is over, reset the state
                     LA_Clippers_game = False
-                    ongoing_games = False
 
                 else:
                     logger.info("The Clippers game hasn't finished yet.")
@@ -222,9 +216,6 @@ async def periodic_check():
                     await channel.send("The Angels Game has finished!", delete_after=seconds_left)
                     if angels_result:
                         logger.info("Conditions are met for Angels game.")
-                        now = datetime.datetime.now(pacific_tz)
-                        tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
-                        seconds_left = (tomorrow - now).seconds
                         await channel.send(
                             "@everyone The Los Angeles Angels have scored 7 points! Free Chick-fil-A sandwich! Open ["
                             "here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
@@ -237,12 +228,14 @@ async def periodic_check():
                         )
                     # Game is over, reset the state
                     LA_Angels_game = False
-                    ongoing_games = False
                 else:
                     logger.info("The Angels game hasn't finished yet.")
                     ongoing_games = True
             if date_change:
                 current_date = today_date
+            if not LAFC_game and not ANA_Ducks_game and not LA_Clippers_game and not LA_Angels_game:
+                ongoing_games = False
+
         # If there are still ongoing games, wait for 10 minutes before checking again
         if ongoing_games:
             logger.info("There is still an ongoing game today! This will check every 10 minutes")
