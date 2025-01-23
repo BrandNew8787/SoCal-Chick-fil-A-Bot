@@ -106,9 +106,10 @@ async def periodic_check():
             tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
             seconds_left = (tomorrow - now).seconds
             today_date = now.date()
+            date_change = False
             if LAFC_game:
                 if today_date > current_date:
-                    current_date = today_date
+                    date_change = True
                     await channel.send("LAFC has a home game today! Be on the lookout for a free sandwich "
                                        ":chicken::sandwich:", delete_after=seconds_left)
                 logger.info("there is an lafc game today!")
@@ -138,7 +139,7 @@ async def periodic_check():
 
             if ANA_Ducks_game:
                 if today_date > current_date:
-                    current_date = today_date
+                    date_change = True
                     await channel.send("The Anaheim Ducks has a home game today! Be on the lookout for a free sandwich "
                                        ":chicken::sandwich:", delete_after=seconds_left)
                 logger.info("There is a ducks game today!")
@@ -174,7 +175,7 @@ async def periodic_check():
 
             if LA_Clippers_game:
                 if today_date > current_date:
-                    current_date = today_date
+                    date_change = True
                     await channel.send("The LA Clippers has a home game today! Be on the lookout for a free sandwich "
                                        ":chicken::sandwich:", delete_after=seconds_left)
                 logger.info("There is a clippers game today!")
@@ -211,7 +212,7 @@ async def periodic_check():
 
             if LA_Angels_game:
                 if today_date > current_date:
-                    current_date = today_date
+                    date_change = True
                     await channel.send("The Los Angeles Clippers has a home game today! Be on the lookout for a free "
                                        "sandwich :chicken::sandwich:", delete_after=seconds_left)
                 logger.info("There is an Angels game today!")
@@ -240,6 +241,8 @@ async def periodic_check():
                 else:
                     logger.info("The Angels game hasn't finished yet.")
                     ongoing_games = True
+            if date_change:
+                current_date = today_date
         # If there are still ongoing games, wait for 10 minutes before checking again
         if ongoing_games:
             logger.info("There is still an ongoing game today! This will check every 10 minutes")
