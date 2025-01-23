@@ -2,6 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import pytz
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 # Define the timezone (Pacific Time Zone)
 pacific_tz = pytz.timezone("America/Los_Angeles")
@@ -97,7 +102,8 @@ def game_today():
                     return False
         return False
     else:
-        return f"Failed to retrieve the page. Status code: {response.status_code}"
+        logger.debug(f"Failed to retrieve the page. Status code: {response.status_code}")
+        return False
 
 
 # returns a string value of the date, time, and opponent of the next lafc home game.
@@ -184,20 +190,9 @@ def get_match_results():
             elif home_score < away_score:
                 outcome = "Lose"
             else:
-                outcome = "The match was a draw"
+                outcome = "Draw"
 
-            # Compile the match data
-            match_info = {
-                'date': date_str,
-                'home_team': home_team,
-                'away_team': away_team,
-                'result': result,
-                'outcome': outcome
-            }
-
-            match_data.append(match_info)
-
-        return match_data
+        return outcome
 
     else:
         return f"Failed to retrieve the page. Status code: {response.status_code}"

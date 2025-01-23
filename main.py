@@ -112,8 +112,8 @@ async def periodic_check():
                     await channel.send("LAFC has a home game today! Be on the lookout for a free sandwich "
                                        ":chicken::sandwich:", delete_after=seconds_left)
                 logger.info("there is an lafc game today!")
-                lafc_results = await LAFC.get_match_results()
-                if lafc_results != "The game has not finished yet!":
+                lafc_results = LAFC.get_match_results()
+                if lafc_results == "Win" or lafc_results == "Lose" or lafc_results == "Draw":
                     logger.info("The game has finished!")
                     await channel.send("The LAFC Game has finished!", delete_after=seconds_left)
                     if lafc_results['outcome'] == "Win":
