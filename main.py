@@ -57,7 +57,6 @@ CHANNEL_ID: Final[int] = int(os.getenv('DISCORD_CHANNEL_ID'))
 # STEP 2: CHECK FOR GAMES TODAY
 async def check_for_games():
     global LAFC_game, ANA_Ducks_game, LA_Angels_game, LA_Clippers_game, clippers_game_id, clippers_result
-
     async with state_lock:
         try:
             logger.debug("Checking for LAFC game")
@@ -104,19 +103,23 @@ async def periodic_check():
     channel = client.get_channel(CHANNEL_ID)  # Get the channel to send messages
 
     while not client.is_closed():
-        logger.info("Starting periodic check for games.")
-        await check_for_games()  # Refresh the state of game variables
         ongoing_games = False
 
-        async with state_lock:
-            # calculate the amount of time left before the day ends
-            now = datetime.datetime.now(pacific_tz)
-            tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
-            seconds_left = (tomorrow - now).seconds
+        # calculate the amount of time left before the day ends
+        now = datetime.datetime.now(pacific_tz)
+        tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
+        seconds_left = (tomorrow - now).seconds
 
-            # retrieve today's date to compare to current date
-            today_date = now.date()
-            date_change = False
+        # retrieve today's date to compare to current date
+        today_date = now.date()
+        date_change = False
+
+        if today_date > current_date:
+            logger.info("Starting periodic check for games.")
+            await check_for_games()  # Refresh the state of game variables
+            date_change = True
+
+        async with state_lock:
             if LAFC_game:
                 if today_date > current_date:
                     date_change = True
@@ -246,7 +249,7 @@ async def periodic_check():
                 else:
                     logger.info("The Angels game hasn't finished yet.")
                     ongoing_games = True
-            if date_change:
+            if date_change and ongoing_games is False:
                 current_date = today_date
                 notifications_sent["LAFC"] = False
                 notifications_sent["Ducks"] = False
@@ -259,10 +262,10 @@ async def periodic_check():
         # If there are still ongoing games, wait for 10 minutes before checking again
         if ongoing_games:
             logger.info("There is still an ongoing game today! This will check every 10 minutes")
-            await asyncio.sleep(600)  # Wait for 10 minutes before checking again
+            await asyncio.sleep(300)  # Wait for 5 minutes before checking again
         else:
             logger.info("There are no ongoing games today or the games have finished. Wait 6 hours for the next check.")
-            await asyncio.sleep(21600)  # Wait for 6 hours before checking for new games
+            await asyncio.sleep(10800)  # Wait for 3 hours before checking for new games
 
 
 # STEP 5: MESSAGE FUNCTIONALITY
