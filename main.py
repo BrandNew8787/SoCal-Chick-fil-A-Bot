@@ -112,6 +112,8 @@ async def periodic_check():
 
         # retrieve today's date to compare to current date
         today_date = now.date()
+        print(today_date)
+        print(current_date)
         date_change = False
 
         if today_date > current_date:
@@ -255,6 +257,8 @@ async def periodic_check():
                 notifications_sent["Ducks"] = False
                 notifications_sent["Clippers"] = False
                 notifications_sent["Angels"] = False
+            elif date_change:
+                current_date = today_date
 
             if not LAFC_game and not ANA_Ducks_game and not LA_Clippers_game and not LA_Angels_game:
                 ongoing_games = False
