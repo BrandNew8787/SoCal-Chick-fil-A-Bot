@@ -38,7 +38,7 @@ async def get_response(user_input: str, bot_mention: str) -> str:
         duck_date = datetime.strptime(duck_date, "%Y-%m-%d") if duck_date else None
         return f"The next Ducks Home Game:\n\tGAME: Anaheim Ducks vs. {duck_opp}\n\tDATE: {duck_date.strftime('%b %d, %Y')}"
     elif 'next lafc game' in lowered:
-        lafc_date, lafc_opp = LAFC.get_next_lafc_home_game()
+        lafc_date, lafc_opp = await LAFC.get_next_lafc_home_game()
         if lafc_date == "No upcoming LAFC home games found." :
             return "There are no scheduled LAFC Home Games coming up. Try again in January for next years schedule."
         else:
@@ -54,7 +54,7 @@ async def get_response(user_input: str, bot_mention: str) -> str:
 
 async def next_chance():
     # Get upcoming game dates and opponents
-    lafc_date, lafc_opp = LAFC.get_next_lafc_home_game()
+    lafc_date, lafc_opp = await LAFC.get_next_lafc_home_game()
     duck_date, duck_opp_loc, duck_opp = await Anaheim_Ducks.get_ducks_next_home_game()  # Await here
     angels_date, angels_opp = LA_Angels.get_next_angels_game()
     clippers_date, clippers_opp = LA_Clippers.get_next_clippers_home_game()
