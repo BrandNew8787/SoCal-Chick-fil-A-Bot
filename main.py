@@ -144,7 +144,8 @@ async def periodic_check():
                         else:
                             logger.info("Conditions are met for LAFC games.")
                             await channel.send(
-                                "LAFC did not win... no free sandwich today..."
+                                "LAFC did not win... no free sandwich today...",
+                                delete_after=seconds_left
                             )
                     # Game is over, reset the state
                     LAFC_game = False
@@ -178,7 +179,8 @@ async def periodic_check():
                         else:
                             logger.info("Conditions are not met for Ducks game.")
                             await channel.send(
-                                "The Anaheim Ducks did not score 5 points... no free sandwich today..."
+                                "The Anaheim Ducks did not score 5 points... no free sandwich today...",
+                                delete_after=seconds_left
                             )
                     # Game is over, reset the state
                     ANA_Ducks_game = False
@@ -213,7 +215,8 @@ async def periodic_check():
                             logger.info("Conditions are not met for clippers game.")
                             await channel.send(
                                 "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich "
-                                "today..."
+                                "today...",
+                                delete_after=seconds_left
                             )
                     # Game is over, reset the state
                     LA_Clippers_game = False
@@ -244,7 +247,8 @@ async def periodic_check():
                         else:
                             logger.info("Conditions are not met for Angels game.")
                             await channel.send(
-                                "The Angels did not score 7 points... no free sandwich today..."
+                                "The Angels did not score 7 points... no free sandwich today...",
+                                delete_after=seconds_left
                             )
                     # Game is over, reset the state
                     LA_Angels_game = False
