@@ -273,7 +273,7 @@ async def periodic_check():
             await asyncio.sleep(300)  # Wait for 5 minutes before checking again
         else:
             logger.info("There are no ongoing games today or the games have finished. Wait 3 hours for the next check.")
-            await asyncio.sleep(10800)  # Wait for 3 hours before checking for new games
+            await asyncio.sleep(600)  # Wait for 10 minutes before checking for new games
 
 
 # STEP 5: MESSAGE FUNCTIONALITY
