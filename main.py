@@ -99,181 +99,184 @@ async def check_for_games():
 # STEP 4: PERIODIC CHECK FUNCTION
 async def periodic_check():
     global LAFC_game, ANA_Ducks_game, LA_Angels_game, LA_Clippers_game, clippers_game_id, clippers_result, current_date
-    await client.wait_until_ready()  # Wait until the bot is ready
-    channel = client.get_channel(CHANNEL_ID)  # Get the channel to send messages
+    try:
+        await client.wait_until_ready()  # Wait until the bot is ready
+        channel = client.get_channel(CHANNEL_ID)  # Get the channel to send messages
 
-    while not client.is_closed():
-        ongoing_games = False
+        while not client.is_closed():
+            ongoing_games = False
 
-        # calculate the amount of time left before the day ends
-        now = datetime.datetime.now(pacific_tz)
-        tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
-        seconds_left = (tomorrow - now).seconds
+            # calculate the amount of time left before the day ends
+            now = datetime.datetime.now(pacific_tz)
+            tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
+            seconds_left = (tomorrow - now).seconds
 
-        # retrieve today's date to compare to current date
-        today_date = now.date()
-        print(today_date)
-        print(current_date)
-        date_change = False
+            # retrieve today's date to compare to current date
+            today_date = now.date()
+            print(today_date)
+            print(current_date)
+            date_change = False
 
-        if today_date > current_date:
-            logger.info("Starting periodic check for games.")
-            await check_for_games()  # Refresh the state of game variables
-            date_change = True
+            if today_date > current_date:
+                logger.info("Starting periodic check for games.")
+                await check_for_games()  # Refresh the state of game variables
+                date_change = True
 
-        async with state_lock:
-            if LAFC_game:
-                if today_date > current_date:
-                    date_change = True
-                    await channel.send("LAFC has a home game today! Be on the lookout for a free sandwich "
-                                       ":chicken::sandwich:", delete_after=seconds_left)
-                logger.info("there is an lafc game today!")
-                lafc_results = await LAFC.get_match_results()
-                if lafc_results == "Win" or lafc_results == "Lose" or lafc_results == "Draw":
-                    if not notifications_sent["LAFC"]:
-                        notifications_sent["LAFC"] = True
-                        logger.info("The game has finished!")
-                        await channel.send("The LAFC Game has finished!", delete_after=seconds_left)
-                        if lafc_results['outcome'] == "Win":
-                            logger.info("Conditions are met for LAFC game.")
-                            await channel.send(
-                                "@everyone LAFC has won their home game! Free Chick-fil-A sandwich! Open "
-                                "[here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
-                                delete_after=seconds_left
-                            )
-                        else:
-                            logger.info("Conditions are met for LAFC games.")
-                            await channel.send(
-                                "LAFC did not win... no free sandwich today...",
-                                delete_after=seconds_left
-                            )
-                    # Game is over, reset the state
-                    LAFC_game = False
+            async with state_lock:
+                if LAFC_game:
+                    if today_date > current_date:
+                        date_change = True
+                        await channel.send("LAFC has a home game today! Be on the lookout for a free sandwich "
+                                           ":chicken::sandwich:", delete_after=seconds_left)
+                    logger.info("there is an lafc game today!")
+                    lafc_results = await LAFC.get_match_results()
+                    if lafc_results == "Win" or lafc_results == "Lose" or lafc_results == "Draw":
+                        if not notifications_sent["LAFC"]:
+                            notifications_sent["LAFC"] = True
+                            logger.info("The game has finished!")
+                            await channel.send("The LAFC Game has finished!", delete_after=seconds_left)
+                            if lafc_results['outcome'] == "Win":
+                                logger.info("Conditions are met for LAFC game.")
+                                await channel.send(
+                                    "@everyone LAFC has won their home game! Free Chick-fil-A sandwich! Open "
+                                    "[here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
+                                    delete_after=seconds_left
+                                )
+                            else:
+                                logger.info("Conditions are met for LAFC games.")
+                                await channel.send(
+                                    "LAFC did not win... no free sandwich today...",
+                                    delete_after=seconds_left
+                                )
+                        # Game is over, reset the state
+                        LAFC_game = False
 
-                else:
-                    logger.info("The LAFC game hasn't finished yet.")
-                    ongoing_games = True  # Game is still ongoing, continue checking
+                    else:
+                        logger.info("The LAFC game hasn't finished yet.")
+                        ongoing_games = True  # Game is still ongoing, continue checking
 
-            if ANA_Ducks_game:
-                if today_date > current_date:
-                    date_change = True
-                    await channel.send("The Anaheim Ducks has a home game today! Be on the lookout for a free sandwich "
-                                       ":chicken::sandwich:", delete_after=seconds_left)
-                logger.info("There is a ducks game today!")
-                # find the game ID for today
-                today_ducks_game = await Anaheim_Ducks.get_game_id()
-                ducks_results = await Anaheim_Ducks.check_ducks_score(today_ducks_game)
-                if ducks_results != "The game hasn't finished yet!":
-                    if not notifications_sent["Ducks"]:
-                        notifications_sent["Ducks"] = True
-                        logger.info("The game has finished!")
-                        await channel.send("The Ducks Game has finished!", delete_after=seconds_left)
-                        if ducks_results:
-                            logger.info("Conditions are met for Ducks games.")
-                            await channel.send(
-                                "@everyone The Anaheim Ducks have scored 5 or more goals at a home game! Free Chick-fil-A "
-                                "sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your"
-                                "sandwich!",
-                                delete_after=seconds_left
-                            )
-                        else:
-                            logger.info("Conditions are not met for Ducks game.")
-                            await channel.send(
-                                "The Anaheim Ducks did not score 5 points... no free sandwich today...",
-                                delete_after=seconds_left
-                            )
-                    # Game is over, reset the state
-                    ANA_Ducks_game = False
+                if ANA_Ducks_game:
+                    if today_date > current_date:
+                        date_change = True
+                        await channel.send("The Anaheim Ducks has a home game today! Be on the lookout for a free sandwich "
+                                           ":chicken::sandwich:", delete_after=seconds_left)
+                    logger.info("There is a ducks game today!")
+                    # find the game ID for today
+                    today_ducks_game = await Anaheim_Ducks.get_game_id()
+                    ducks_results = await Anaheim_Ducks.check_ducks_score(today_ducks_game)
+                    if ducks_results != "The game hasn't finished yet!":
+                        if not notifications_sent["Ducks"]:
+                            notifications_sent["Ducks"] = True
+                            logger.info("The game has finished!")
+                            await channel.send("The Ducks Game has finished!", delete_after=seconds_left)
+                            if ducks_results:
+                                logger.info("Conditions are met for Ducks games.")
+                                await channel.send(
+                                    "@everyone The Anaheim Ducks have scored 5 or more goals at a home game! Free Chick-fil-A "
+                                    "sandwich! Open [here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your"
+                                    "sandwich!",
+                                    delete_after=seconds_left
+                                )
+                            else:
+                                logger.info("Conditions are not met for Ducks game.")
+                                await channel.send(
+                                    "The Anaheim Ducks did not score 5 points... no free sandwich today...",
+                                    delete_after=seconds_left
+                                )
+                        # Game is over, reset the state
+                        ANA_Ducks_game = False
 
-                else:
-                    logger.info("The Ducks game hasn't finished yet.")
-                    ongoing_games = True  # Game is still ongoing, continue checking
+                    else:
+                        logger.info("The Ducks game hasn't finished yet.")
+                        ongoing_games = True  # Game is still ongoing, continue checking
 
-            if LA_Clippers_game:
-                if today_date > current_date:
-                    date_change = True
-                    await channel.send("The LA Clippers has a home game today! Be on the lookout for a free sandwich "
-                                       ":chicken::sandwich:", delete_after=seconds_left)
-                logger.info("There is a clippers game today!")
-                clippers_result = await LA_Clippers.check_game_finish_v2(clippers_game_id)
-                if clippers_result:
-                    if not notifications_sent["Clippers"]:
-                        notifications_sent["Clippers"] = True
-                        logger.info("The clipper game has finished!")
-                        await channel.send("The Clippers Game has finished!", delete_after=seconds_left)
-                        clippers_4th_quarter = await LA_Clippers.check_missed_ft_in_4th_quarter_v2(clippers_game_id)
-                        if clippers_4th_quarter:
-                            logger.info("Conditions are met for Clippers game.")
-                            # changed this so that it checks if the opponent made one basket or not
-                            await channel.send(
-                                "@everyone The opponents of the Los Angeles Clippers missed 2 free throw at a home game! "
-                                "Free Chick-fil-A sandwich! Open [here]("
-                                "https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
-                                delete_after=seconds_left
-                            )
-                        else:
-                            logger.info("Conditions are not met for clippers game.")
-                            await channel.send(
-                                "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich "
-                                "today...",
-                                delete_after=seconds_left
-                            )
-                    # Game is over, reset the state
-                    LA_Clippers_game = False
+                if LA_Clippers_game:
+                    if today_date > current_date:
+                        date_change = True
+                        await channel.send("The LA Clippers has a home game today! Be on the lookout for a free sandwich "
+                                           ":chicken::sandwich:", delete_after=seconds_left)
+                    logger.info("There is a clippers game today!")
+                    clippers_result = await LA_Clippers.check_game_finish_v2(clippers_game_id)
+                    if clippers_result:
+                        if not notifications_sent["Clippers"]:
+                            notifications_sent["Clippers"] = True
+                            logger.info("The clipper game has finished!")
+                            await channel.send("The Clippers Game has finished!", delete_after=seconds_left)
+                            clippers_4th_quarter = await LA_Clippers.check_missed_ft_in_4th_quarter_v2(clippers_game_id)
+                            if clippers_4th_quarter:
+                                logger.info("Conditions are met for Clippers game.")
+                                # changed this so that it checks if the opponent made one basket or not
+                                await channel.send(
+                                    "@everyone The opponents of the Los Angeles Clippers missed 2 free throw at a home game! "
+                                    "Free Chick-fil-A sandwich! Open [here]("
+                                    "https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
+                                    delete_after=seconds_left
+                                )
+                            else:
+                                logger.info("Conditions are not met for clippers game.")
+                                await channel.send(
+                                    "The Clippers opponents did miss 2 free throws in the 4th quarter... no free sandwich "
+                                    "today...",
+                                    delete_after=seconds_left
+                                )
+                        # Game is over, reset the state
+                        LA_Clippers_game = False
 
-                else:
-                    logger.info("The Clippers game hasn't finished yet.")
-                    ongoing_games = True  # Game is still ongoing, continue checking
+                    else:
+                        logger.info("The Clippers game hasn't finished yet.")
+                        ongoing_games = True  # Game is still ongoing, continue checking
 
-            if LA_Angels_game:
-                if today_date > current_date:
-                    date_change = True
-                    await channel.send("The Los Angeles Clippers has a home game today! Be on the lookout for a free "
-                                       "sandwich :chicken::sandwich:", delete_after=seconds_left)
-                logger.info("There is an Angels game today!")
-                angels_result = await LA_Angels.check_angels_score()
-                if angels_result != "The game has not finished yet!":
-                    if not notifications_sent["Angels"]:
-                        notifications_sent["Angels"] = True
-                        logger.info("The Angels game has finished!")
-                        await channel.send("The Angels Game has finished!", delete_after=seconds_left)
-                        if angels_result:
-                            logger.info("Conditions are met for Angels game.")
-                            await channel.send(
-                                "@everyone The Los Angeles Angels have scored 7 points! Free Chick-fil-A sandwich! Open ["
-                                "here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
-                                delete_after=seconds_left
-                            )
-                        else:
-                            logger.info("Conditions are not met for Angels game.")
-                            await channel.send(
-                                "The Angels did not score 7 points... no free sandwich today...",
-                                delete_after=seconds_left
-                            )
-                    # Game is over, reset the state
-                    LA_Angels_game = False
-                else:
-                    logger.info("The Angels game hasn't finished yet.")
-                    ongoing_games = True
-            if date_change and ongoing_games is False:
-                current_date = today_date
-                notifications_sent["LAFC"] = False
-                notifications_sent["Ducks"] = False
-                notifications_sent["Clippers"] = False
-                notifications_sent["Angels"] = False
-            elif date_change:
-                current_date = today_date
+                if LA_Angels_game:
+                    if today_date > current_date:
+                        date_change = True
+                        await channel.send("The Los Angeles Clippers has a home game today! Be on the lookout for a free "
+                                           "sandwich :chicken::sandwich:", delete_after=seconds_left)
+                    logger.info("There is an Angels game today!")
+                    angels_result = await LA_Angels.check_angels_score()
+                    if angels_result != "The game has not finished yet!":
+                        if not notifications_sent["Angels"]:
+                            notifications_sent["Angels"] = True
+                            logger.info("The Angels game has finished!")
+                            await channel.send("The Angels Game has finished!", delete_after=seconds_left)
+                            if angels_result:
+                                logger.info("Conditions are met for Angels game.")
+                                await channel.send(
+                                    "@everyone The Los Angeles Angels have scored 7 points! Free Chick-fil-A sandwich! Open ["
+                                    "here](https://apps.apple.com/us/app/chick-fil-a/id488818252) to claim your sandwich!",
+                                    delete_after=seconds_left
+                                )
+                            else:
+                                logger.info("Conditions are not met for Angels game.")
+                                await channel.send(
+                                    "The Angels did not score 7 points... no free sandwich today...",
+                                    delete_after=seconds_left
+                                )
+                        # Game is over, reset the state
+                        LA_Angels_game = False
+                    else:
+                        logger.info("The Angels game hasn't finished yet.")
+                        ongoing_games = True
+                if date_change and ongoing_games is False:
+                    current_date = today_date
+                    notifications_sent["LAFC"] = False
+                    notifications_sent["Ducks"] = False
+                    notifications_sent["Clippers"] = False
+                    notifications_sent["Angels"] = False
+                elif date_change:
+                    current_date = today_date
 
-            if not LAFC_game and not ANA_Ducks_game and not LA_Clippers_game and not LA_Angels_game:
-                ongoing_games = False
+                if not LAFC_game and not ANA_Ducks_game and not LA_Clippers_game and not LA_Angels_game:
+                    ongoing_games = False
 
-        # If there are still ongoing games, wait for 10 minutes before checking again
-        if ongoing_games:
-            logger.info("There is still an ongoing game today! This will check every 5 minutes")
-            await asyncio.sleep(300)  # Wait for 5 minutes before checking again
-        else:
-            logger.info("There are no ongoing games today or the games have finished. Wait 3 hours for the next check.")
-            await asyncio.sleep(600)  # Wait for 10 minutes before checking for new games
+            # If there are still ongoing games, wait for 10 minutes before checking again
+            if ongoing_games:
+                logger.info("There is still an ongoing game today! This will check every 5 minutes")
+                await asyncio.sleep(300)  # Wait for 5 minutes before checking again
+            else:
+                logger.info("There are no ongoing games today or the games have finished. Wait 3 hours for the next check.")
+                await asyncio.sleep(600)  # Wait for 10 minutes before checking for new games
+    except Exception as e:
+        logger.critical(f"Fatal error in periodic_check: {e}", exc_info=True)
 
 
 # STEP 5: MESSAGE FUNCTIONALITY
