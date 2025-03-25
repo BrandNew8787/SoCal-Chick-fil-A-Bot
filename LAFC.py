@@ -13,6 +13,13 @@ logger = logging.getLogger(__name__)
 # Define the timezone (Pacific Time Zone)
 pacific_tz = pytz.timezone("America/Los_Angeles")
 
+headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/92.0.4515.107 Safari/537.36",
+        "Referer": "https://www.espn.com/",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+
 
 # returns the date and opponent of the next scheduled lafc game
 async def get_next_lafc_home_game():
@@ -22,7 +29,7 @@ async def get_next_lafc_home_game():
         f"https://fbref.com/en/squads/81d817a3/{year}/matchlogs/c22/schedule/Los-Angeles-FC-Scores-and-Fixtures-Major"
         "-League-Soccer")
 
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(headers=headers) as session:
         try:
             async with session.get(url, timeout=10) as response:
                 if response.status == 200:
@@ -71,7 +78,7 @@ async def game_today():
         "-League-Soccer"
     )
 
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(headers=headers) as session:
         try:
             async with session.get(url, timeout=10) as response:
                 if response.status == 200:
@@ -138,13 +145,6 @@ def upcoming_game(game):
 
 # returns the results of a today's game
 async def get_match_results():
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                      "Chrome/92.0.4515.107 Safari/537.36",
-        "Referer": "https://www.espn.com/",
-        "Accept-Language": "en-US,en;q=0.9",
-    }
-
     url = "https://www.espn.com/soccer/team/results/_/id/18966/usa.lafc"
 
     async with aiohttp.ClientSession() as session:
