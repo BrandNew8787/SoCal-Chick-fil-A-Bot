@@ -331,9 +331,14 @@ async def on_message(message: Message) -> None:
 
 # STEP 8: MAIN ENTRY POINT
 def main() -> None:
-    webserver.keep_alive()
-    client.run(TOKEN)
-
+    try:
+        webserver.keep_alive()
+        client.run(TOKEN)
+    except Exception as e:
+        logger.critical(f"Critical error occurred: {e}", exc_info=True)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        logger.critical(f"Fatal error in main execution: {e}", exc_info=True)
